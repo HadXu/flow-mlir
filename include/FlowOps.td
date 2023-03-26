@@ -76,5 +76,4 @@ def ReturnOp : Flow_Op<"return", [Pure, HasParent<"FuncOp">,
 }
 
 
-
 #endif // FLOW_OPS
