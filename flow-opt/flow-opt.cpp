@@ -1,4 +1,5 @@
 #include "FlowDialect.h"
+#include "Passes.h"
 
 #include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/ExecutionEngine/ExecutionEngine.h"
@@ -55,6 +56,17 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
                        mlir::OwningOpRef<mlir::ModuleOp> &module) {
   if (int error = loadMLIR(context, module))
     return error;
+
+  mlir::PassManager pm(&context);
+  applyPassManagerCLOptions(pm);
+
+  pm.addPass(mlir::flow::createLowerToAffinePass());
+  mlir::OpPassManager &optPM = pm.nest<mlir::flow::FuncOp>();
+  optPM.addPass(mlir::createCanonicalizerPass());
+  optPM.addPass(mlir::createCSEPass());
+
+  if (mlir::failed(pm.run(*module)))
+    return 4;
   return 0;
 }
 
@@ -66,5 +78,6 @@ int main(int argc, char **argv) {
   if (int error = loadAndProcessMLIR(context, module))
     return error;
 
+  module->dump();
   return 0;
 }

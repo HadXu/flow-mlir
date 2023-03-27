@@ -75,5 +75,12 @@ def ReturnOp : Flow_Op<"return", [Pure, HasParent<"FuncOp">,
   let hasVerifier = 1;
 }
 
+def PrintOp : Flow_Op<"print"> {
+    let summary = "print operation";
+    let description = [{ "flow.print" }];
+    let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef]>:$input);
+
+    let assemblyFormat = "$input attr-dict `:` type($input)";
+}
 
 #endif // FLOW_OPS
