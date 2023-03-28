@@ -34,6 +34,26 @@ static cl::opt<std::string> inputFilename(cl::Positional,
                                           cl::init("-"),
                                           cl::value_desc("filename"));
 
+namespace {
+  enum Action {
+    None,
+    DumpMLIR,
+    DumpMLIRAffine,
+    DumpMLIRLLVM,
+    DumpLLVMIR,
+    RunJIT,
+  };
+}
+
+static cl::opt<enum Action> emitAction(
+        "emit", cl::desc("Select the kind of output"),
+        cl::values(clEnumValN(DumpMLIR, "mlir", "out mlir")),
+        cl::values(clEnumValN(DumpMLIRAffine, "mlir-affine", "out mlir-affine")),
+        cl::values(clEnumValN(DumpMLIRLLVM, "mlir-llvm", "out mlir-llvm")),
+        cl::values(clEnumValN(DumpLLVMIR, "llvm", "out llvm")),
+        cl::values(clEnumValN(RunJIT, "jit", "run jit")));
+
+
 int loadMLIR(mlir::MLIRContext &context,
              mlir::OwningOpRef<mlir::ModuleOp> &module) {
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr = llvm::MemoryBuffer::getFile(inputFilename);
@@ -60,12 +80,19 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   mlir::PassManager pm(&context);
   applyPassManagerCLOptions(pm);
 
-  pm.addPass(mlir::flow::createLowerToAffinePass());
-  mlir::OpPassManager &optPM = pm.nest<mlir::flow::FuncOp>();
-  optPM.addPass(mlir::createCanonicalizerPass());
-  optPM.addPass(mlir::createCSEPass());
+  bool isLoweringToAffine = emitAction >= Action::DumpMLIRAffine;
+  bool isLoweringToLLVM = emitAction >= Action::DumpMLIRLLVM;
 
-  pm.addPass(mlir::flow::createLowerToLLVMPass());
+  if (isLoweringToAffine) {
+    pm.addPass(mlir::flow::createLowerToAffinePass());
+    mlir::OpPassManager &optPM = pm.nest<mlir::flow::FuncOp>();
+    optPM.addPass(mlir::createCanonicalizerPass());
+    optPM.addPass(mlir::createCSEPass());
+  }
+
+  if (isLoweringToLLVM) {
+    pm.addPass(mlir::flow::createLowerToLLVMPass());
+  }
 
   if (mlir::failed(pm.run(*module)))
     return 4;
@@ -80,15 +107,12 @@ int runJit(mlir::ModuleOp module) {
 
   auto optPipeline = mlir::makeOptimizingTransformer(0, 0, nullptr);
 
-  // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
-  // the module.
   mlir::ExecutionEngineOptions engineOptions;
   engineOptions.transformer = optPipeline;
   auto maybeEngine = mlir::ExecutionEngine::create(module, engineOptions);
   assert(maybeEngine && "failed to construct an execution engine");
   auto &engine = maybeEngine.get();
 
-  // Invoke the JIT-compiled function.
   auto invocationResult = engine->invokePacked("main");
   if (invocationResult) {
     llvm::errs() << "JIT invocation failed\n";
@@ -99,15 +123,28 @@ int runJit(mlir::ModuleOp module) {
 }
 
 int main(int argc, char **argv) {
-  cl::ParseCommandLineOptions(argc, argv, "toy compiler\n");
+  cl::ParseCommandLineOptions(argc, argv, "flow compiler\n");
   mlir::MLIRContext context;
   context.getOrLoadDialect<mlir::flow::FlowDialect>();
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module))
     return error;
 
-  //  module->dump();
+  bool isOutputingMLIR = emitAction <= Action::DumpMLIRLLVM;
 
-  runJit(*module);
+  if (isOutputingMLIR) {
+    module->dump();
+    return 0;
+  }
+
+  if (emitAction == Action::DumpLLVMIR) {
+    return 0;
+  }
+
+  if (emitAction == Action::RunJIT) {
+    return runJit(*module);
+  }
+  llvm::errs() << "No action specified\n";
+
   return 0;
 }
