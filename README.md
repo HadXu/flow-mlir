@@ -13,11 +13,13 @@
 5. flow.mul
 6. flow.sub
 7. flow.div
-8. flow.print
+8. flow.print ✅
 9. flow.conv
 10. flow.dot
 
-## lowing to llvm (todo)
+## lowing to llvm
+
+主要是flow.print lowing到llvm层面，调用了**printf**方法
 
 ## Usage
 
