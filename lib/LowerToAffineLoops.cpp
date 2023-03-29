@@ -140,6 +140,7 @@ void FlowToAffineLowingPass::runOnOperation() {
   ConversionTarget target(getContext());
   target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect, memref::MemRefDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
+  // 确保TensorType已经全部转换为MemRef
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
                          [](Type type) { return type.isa<TensorType>(); });

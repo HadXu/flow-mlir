@@ -122,6 +122,25 @@ int runJit(mlir::ModuleOp module) {
   return 0;
 }
 
+int dumpLLVMIR(mlir::ModuleOp module) {
+  mlir::registerLLVMDialectTranslation(*module->getContext());
+  llvm::LLVMContext llvmContext;
+  auto llvmModule = mlir::translateModuleToLLVMIR(module, llvmContext);
+  if (!llvmModule) {
+    llvm::errs() << "Failed to emit LLVM IR\n";
+    return -1;
+  }
+
+  llvm::InitializeNativeTarget();
+  llvm::InitializeNativeTargetAsmPrinter();
+  mlir::ExecutionEngine::setupTargetTriple(llvmModule.get());
+
+  llvm::errs() << *llvmModule << "\n";
+
+
+  return 0;
+}
+
 int main(int argc, char **argv) {
   cl::ParseCommandLineOptions(argc, argv, "flow compiler\n");
   mlir::MLIRContext context;
@@ -138,7 +157,7 @@ int main(int argc, char **argv) {
   }
 
   if (emitAction == Action::DumpLLVMIR) {
-    return 0;
+    return dumpLLVMIR(*module);
   }
 
   if (emitAction == Action::RunJIT) {
