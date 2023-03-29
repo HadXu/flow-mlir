@@ -83,4 +83,17 @@ def PrintOp : Flow_Op<"print"> {
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 
+def AddOp : Flow_Op<"add"> {
+    let summary = "add operation";
+    let description = [{ "flow.add" }];
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+    let results = (outs F64Tensor);
+
+    let hasCustomAssemblyFormat = 1;
+
+    let builders = [
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs)>
+     ];
+}
+
 #endif // FLOW_OPS

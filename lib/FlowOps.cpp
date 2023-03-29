@@ -9,6 +9,52 @@
 using namespace mlir;
 using namespace mlir::flow;
 
+namespace {
+  static mlir::ParseResult parseBinaryOp(mlir::OpAsmParser &parser,
+                                         mlir::OperationState &result) {
+    SmallVector<mlir::OpAsmParser::UnresolvedOperand, 2> operands;
+    SMLoc operandsLoc = parser.getCurrentLocation();
+    Type type;
+    if (parser.parseOperandList(operands, /*requiredOperandCount=*/2) ||
+        parser.parseOptionalAttrDict(result.attributes) ||
+        parser.parseColonType(type))
+      return mlir::failure();
+
+    // If the type is a function type, it contains the input and result types of
+    // this operation.
+    if (FunctionType funcType = type.dyn_cast<FunctionType>()) {
+      if (parser.resolveOperands(operands, funcType.getInputs(), operandsLoc,
+                                 result.operands))
+        return mlir::failure();
+      result.addTypes(funcType.getResults());
+      return mlir::success();
+    }
+
+    // Otherwise, the parsed type is the type of both operands and results.
+    if (parser.resolveOperands(operands, type, result.operands))
+      return mlir::failure();
+    result.addTypes(type);
+    return mlir::success();
+  }
+
+  static void printBinaryOp(mlir::OpAsmPrinter &printer, mlir::Operation *op) {
+    printer << " " << op->getOperands();
+    printer.printOptionalAttrDict(op->getAttrs());
+    printer << " : ";
+
+    Type resultType = *op->result_type_begin();
+
+    if (llvm::all_of(op->getOperandTypes(),
+                     [=](Type type) { return type == resultType; })) {
+      printer << resultType;
+      return;
+    }
+
+    printer.printFunctionalType(op->getOperandTypes(), op->getResultTypes());
+  }
+}// namespace
+
+
 void ConstantOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
                        double value) {
   auto dataType = RankedTensorType::get({}, builder.getF64Type());
@@ -112,6 +158,14 @@ mlir::LogicalResult ReturnOp::verify() {
   return emitError() << "type of return operand (" << inputType
                      << ") doesn't match function result type (" << resultType
                      << ")";
+}
+
+void AddOp::print(mlir::OpAsmPrinter &p) {
+  printBinaryOp(p, *this);
+}
+
+mlir::ParseResult AddOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationState &result) {
+  return parseBinaryOp(parser, result);
 }
 
 #define GET_OP_CLASSES
