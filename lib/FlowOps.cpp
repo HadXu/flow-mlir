@@ -192,5 +192,36 @@ mlir::ParseResult DivOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationSta
   return parseBinaryOp(parser, result);
 }
 
+
+//void ConstantOp::print(mlir::OpAsmPrinter &printer) {
+//  printer << " ";
+//  printer.printOptionalAttrDict((*this)->getAttrs(), {"value"});
+//  printer << getValue();
+//}
+
+void SumOp::print(mlir::OpAsmPrinter &printer) {
+  printer << " ";
+  printer.printOperand(getOperand());
+  printer << " : ";
+  printer.printType(getOperand().getType());
+}
+
+mlir::ParseResult SumOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationState &result) {
+  mlir::OpAsmParser::UnresolvedOperand operand;
+  Type type;
+
+  if (parser.parseOperand(operand) ||
+      parser.parseOptionalAttrDict(result.attributes) ||
+      parser.parseColonType(type))
+    return mlir::failure();
+
+  if (parser.resolveOperand(operand, type, result.operands))
+    return mlir::failure();
+
+  result.addTypes(type);
+  return success();
+}
+
+
 #define GET_OP_CLASSES
 #include "FlowOps.cpp.inc"

@@ -135,11 +135,17 @@ def DivOp : Flow_Op<"div"> {
      ];
 }
 
+
 def SumOp : Flow_Op<"sum"> {
     let summary = "sum operation";
     let description = [{ "flow.sum" }];
     let arguments = (ins F64Tensor:$in);
     let results = (outs F64);
+
+    let hasCustomAssemblyFormat = 1;
+    let builders = [
+        OpBuilder<(ins "Value":$in)>
+     ];
 }
 
 #endif // FLOW_OPS
