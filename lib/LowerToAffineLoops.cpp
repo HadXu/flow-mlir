@@ -81,6 +81,8 @@ namespace {
 
   using AddOpLowering = BinaryOpLowering<flow::AddOp, arith::AddFOp>;
   using SubOpLowering = BinaryOpLowering<flow::SubOp, arith::SubFOp>;
+  using MulOpLowering = BinaryOpLowering<flow::MulOp, arith::MulFOp>;
+  using DivOpLowering = BinaryOpLowering<flow::DivOp, arith::DivFOp>;
 
   struct FuncOpLowering : public OpConversionPattern<flow::FuncOp> {
     using OpConversionPattern<flow::FuncOp>::OpConversionPattern;
@@ -201,7 +203,9 @@ void FlowToAffineLowingPass::runOnOperation() {
   });
 
   RewritePatternSet patterns(&getContext());
-  patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering, PrintOpLowering, AddOpLowering, SubOpLowering>(&getContext());
+  patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
+               PrintOpLowering,
+               AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }

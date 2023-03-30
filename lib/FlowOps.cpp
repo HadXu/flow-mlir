@@ -176,5 +176,21 @@ mlir::ParseResult SubOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationSta
   return parseBinaryOp(parser, result);
 }
 
+void MulOp::print(mlir::OpAsmPrinter &p) {
+  printBinaryOp(p, *this);
+}
+
+mlir::ParseResult MulOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationState &result) {
+  return parseBinaryOp(parser, result);
+}
+
+void DivOp::print(mlir::OpAsmPrinter &p) {
+  printBinaryOp(p, *this);
+}
+
+mlir::ParseResult DivOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationState &result) {
+  return parseBinaryOp(parser, result);
+}
+
 #define GET_OP_CLASSES
 #include "FlowOps.cpp.inc"

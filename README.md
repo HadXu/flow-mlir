@@ -10,9 +10,9 @@
 4. flow.transpose
 5. flow.reshape
 4. flow.add ✅
-5. flow.mul
+5. flow.mul ✅
 6. flow.sub ✅
-7. flow.div
+7. flow.div ✅
 8. flow.print ✅
 9. flow.conv
 10. flow.dot

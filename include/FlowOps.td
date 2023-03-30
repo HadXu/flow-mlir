@@ -109,4 +109,30 @@ def SubOp : Flow_Op<"sub"> {
      ];
 }
 
+def MulOp : Flow_Op<"mul"> {
+    let summary = "mul operation";
+    let description = [{ "flow.mul" }];
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+    let results = (outs F64Tensor);
+
+    let hasCustomAssemblyFormat = 1;
+
+    let builders = [
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs)>
+     ];
+}
+
+def DivOp : Flow_Op<"div"> {
+    let summary = "div operation";
+    let description = [{ "flow.div" }];
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+    let results = (outs F64Tensor);
+
+    let hasCustomAssemblyFormat = 1;
+
+    let builders = [
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs)>
+     ];
+}
+
 #endif // FLOW_OPS
