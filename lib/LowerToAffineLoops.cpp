@@ -27,7 +27,61 @@ static Value insertAllocAndDealloc(MemRefType type, Location loc,
   return alloc;
 }
 
+using LoopIterationFn = function_ref<Value(OpBuilder &rewriter, ValueRange memRefOperands, ValueRange loopIvs)>;
+
+static void lowerOpToLoops(Operation *op, ValueRange operands,
+                           PatternRewriter &rewriter,
+                           LoopIterationFn processIteration) {
+
+  auto tensorType = (*op->result_type_begin()).cast<TensorType>();
+  auto loc = op->getLoc();
+
+  auto memRefType = MemRefType::get(tensorType.getShape(), tensorType.getElementType());
+
+  auto alloc = insertAllocAndDealloc(memRefType, loc, rewriter);
+
+  SmallVector<int64_t, 4> lowerBounds(tensorType.getRank(), 0);// 2
+  SmallVector<int64_t, 4> steps(tensorType.getRank(), 1);
+
+  buildAffineLoopNest(
+          rewriter, loc, lowerBounds, tensorType.getShape(), steps, [&](OpBuilder &nestedBuilder, Location loc, ValueRange ivs) {
+            Value valueToStore = processIteration(nestedBuilder, operands, ivs);
+            nestedBuilder.create<AffineStoreOp>(loc, valueToStore, alloc, ivs);
+          });
+  rewriter.replaceOp(op, alloc);
+}
+
+
 namespace {
+  template<typename BinaryOp, typename LoweredBinaryOp>
+  struct BinaryOpLowering : public ConversionPattern {
+    BinaryOpLowering(MLIRContext *ctx)
+        : ConversionPattern(BinaryOp::getOperationName(), 1, ctx) {}
+
+    LogicalResult
+    matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                    ConversionPatternRewriter &rewriter) const final {
+      auto loc = op->getLoc();
+      lowerOpToLoops(op, operands, rewriter,
+                     [loc](OpBuilder &builder, ValueRange memRefOperands,
+                           ValueRange loopIvs) {
+                       typename BinaryOp::Adaptor binaryAdaptor(memRefOperands);
+
+                       auto loadedLhs = builder.create<AffineLoadOp>(
+                               loc, binaryAdaptor.getLhs(), loopIvs);
+                       auto loadedRhs = builder.create<AffineLoadOp>(
+                               loc, binaryAdaptor.getRhs(), loopIvs);
+
+                       return builder.create<LoweredBinaryOp>(loc, loadedLhs,
+                                                              loadedRhs);
+                     });
+      return success();
+    }
+  };
+
+  using AddOpLowering = BinaryOpLowering<flow::AddOp, arith::AddFOp>;
+  using SubOpLowering = BinaryOpLowering<flow::SubOp, arith::SubFOp>;
+
   struct FuncOpLowering : public OpConversionPattern<flow::FuncOp> {
     using OpConversionPattern<flow::FuncOp>::OpConversionPattern;
     LogicalResult matchAndRewrite(flow::FuncOp op, OpAdaptor adaptor,
@@ -147,7 +201,7 @@ void FlowToAffineLowingPass::runOnOperation() {
   });
 
   RewritePatternSet patterns(&getContext());
-  patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering, PrintOpLowering>(&getContext());
+  patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering, PrintOpLowering, AddOpLowering, SubOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }

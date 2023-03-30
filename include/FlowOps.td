@@ -96,4 +96,17 @@ def AddOp : Flow_Op<"add"> {
      ];
 }
 
+def SubOp : Flow_Op<"sub"> {
+    let summary = "sub operation";
+    let description = [{ "flow.sub" }];
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+    let results = (outs F64Tensor);
+
+    let hasCustomAssemblyFormat = 1;
+
+    let builders = [
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs)>
+     ];
+}
+
 #endif // FLOW_OPS

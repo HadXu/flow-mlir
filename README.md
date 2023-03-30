@@ -9,9 +9,9 @@
 3. flow.return ✅
 4. flow.transpose
 5. flow.reshape
-4. flow.add
+4. flow.add ✅
 5. flow.mul
-6. flow.sub
+6. flow.sub ✅
 7. flow.div
 8. flow.print ✅
 9. flow.conv
@@ -21,7 +21,10 @@
 ```c++
 flow.func @main() {
     %0 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
-    flow.print %0: tensor<2x3xf64>
+    %1 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
+    %2 = flow.add %1, %0: tensor<2x3xf64>
+    %3 = flow.sub %1, %0: tensor<2x3xf64>
+    flow.print %3: tensor<2x3xf64>
     flow.return
 }
 ```

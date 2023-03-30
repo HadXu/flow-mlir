@@ -168,5 +168,13 @@ mlir::ParseResult AddOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationSta
   return parseBinaryOp(parser, result);
 }
 
+void SubOp::print(mlir::OpAsmPrinter &p) {
+  printBinaryOp(p, *this);
+}
+
+mlir::ParseResult SubOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationState &result) {
+  return parseBinaryOp(parser, result);
+}
+
 #define GET_OP_CLASSES
 #include "FlowOps.cpp.inc"
