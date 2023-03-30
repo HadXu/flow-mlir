@@ -135,4 +135,11 @@ def DivOp : Flow_Op<"div"> {
      ];
 }
 
+def SumOp : Flow_Op<"sum"> {
+    let summary = "sum operation";
+    let description = [{ "flow.sum" }];
+    let arguments = (ins F64Tensor:$in);
+    let results = (outs F64);
+}
+
 #endif // FLOW_OPS
