@@ -140,12 +140,13 @@ def SumOp : Flow_Op<"sum"> {
     let summary = "sum operation";
     let description = [{ "flow.sum" }];
     let arguments = (ins F64Tensor:$in);
-    let results = (outs F64);
+    let results = (outs F64:$out);
 
     let hasCustomAssemblyFormat = 1;
     let builders = [
         OpBuilder<(ins "Value":$in)>
      ];
+    let assemblyFormat = "$in attr-dict `:` type($in) `to` type($out)";
 }
 
 #endif // FLOW_OPS

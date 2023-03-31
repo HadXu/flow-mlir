@@ -180,6 +180,29 @@ namespace {
     }
   };
 
+  struct SumOpLowering : public ConversionPattern {
+    SumOpLowering(MLIRContext *context)
+        : ConversionPattern(flow::SumOp::getOperationName(), 1, context) {}
+
+    LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                                  ConversionPatternRewriter &rewriter) const final {
+      llvm::errs() << "sum op lowering\n";
+      auto loc = op->getLoc();
+      /// %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0]> : tensor<4xf64>
+      /// %2 = flow.sum %0: tensor<4xf64> to f64
+
+      auto input = operands[0];
+      input.dump();
+      auto inputType = input.getType().cast<mlir::ShapedType>();// memref<fxf64>
+      inputType.dump();
+
+      op->get
+
+              rewriter.eraseOp(op);
+      return success();
+    }
+  };
+
 }// namespace
 
 namespace {
@@ -205,7 +228,8 @@ void FlowToAffineLowingPass::runOnOperation() {
   RewritePatternSet patterns(&getContext());
   patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
                PrintOpLowering,
-               AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering>(&getContext());
+               AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
+               SumOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }

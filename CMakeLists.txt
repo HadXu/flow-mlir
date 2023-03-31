@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.15)
 
 project(flow LANGUAGES CXX C)
 
+# /home/lay/llvm/build/bin
+# $ export CC=/usr/bin/clang
+# $ export CXX=/usr/bin/clang++
 set(CMAKE_CXX_STANDARD 17)
 
 if (UNIX AND NOT APPLE)
