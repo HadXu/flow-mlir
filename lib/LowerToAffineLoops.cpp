@@ -195,10 +195,15 @@ namespace {
       input.dump();
       auto inputType = input.getType().cast<mlir::ShapedType>();// memref<fxf64>
       inputType.dump();
+      auto outputType = op->getResult(0).getType();// f64
+      outputType.dump();
 
-      op->get
+      auto shape = inputType.getShape();// [4]
+      assert(shape.size() == 1 && "expected 1D tensor");
+      auto rank = shape.size();
 
-              rewriter.eraseOp(op);
+
+      rewriter.eraseOp(op);
       return success();
     }
   };
