@@ -7,13 +7,17 @@
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/Dialect/Linalg/Transforms/Transforms.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
+#include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/IR/BuiltinDialect.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "llvm/ADT/Sequence.h"
 
 using namespace mlir;
+// https://github.com/buddy-compiler/buddy-mlir/blob/main/midend/lib/Conversion/LowerDAP/LowerDAPPass.cpp
+using namespace mlir::linalg;
 
 static Value insertAllocAndDealloc(MemRefType type, Location loc,
                                    PatternRewriter &rewriter) {
@@ -187,6 +191,7 @@ namespace {
     LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
                                   ConversionPatternRewriter &rewriter) const final {
       llvm::errs() << "sum op lowering\n";
+      auto ctx = op->getContext();
       auto loc = op->getLoc();
       /// %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0]> : tensor<4xf64>
       /// %2 = flow.sum %0: tensor<4xf64> to f64
@@ -200,7 +205,11 @@ namespace {
 
       auto shape = inputType.getShape();// [4]
       assert(shape.size() == 1 && "expected 1D tensor");
-      auto rank = shape.size();
+
+      MemRefType bufferTy = MemRefType::get(1, outputType);
+      Value buffer = rewriter.create<memref::AllocOp>(loc, bufferTy);
+
+      auto loop = rewriter.create<mlir::AffineForOp>(loc, 0, shape[0]);
 
 
       rewriter.eraseOp(op);
