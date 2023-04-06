@@ -8,5 +8,6 @@ flow.func @main() {
     // flow.print %5: tensor<2x3xf64>
     %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0]> : tensor<4xf64>
     %2 = flow.sum %0: tensor<4xf64> to f64
+    flow.print %2: f64
     flow.return
 }

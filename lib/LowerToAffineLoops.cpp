@@ -206,13 +206,14 @@ namespace {
       auto shape = inputType.getShape();// [4]
       assert(shape.size() == 1 && "expected 1D tensor");
 
-      MemRefType bufferTy = MemRefType::get(1, outputType);
-      Value buffer = rewriter.create<memref::AllocOp>(loc, bufferTy);
-
-      auto loop = rewriter.create<mlir::AffineForOp>(loc, 0, shape[0]);
-
-
-      rewriter.eraseOp(op);
+      Value sum = rewriter.create<arith::ConstantOp>(loc, FloatAttr::get(outputType, 0.0));
+      for (int i = 0; i < shape[0]; i++) {
+        Value index = rewriter.create<arith::ConstantIndexOp>(loc, i);
+        Value a = rewriter.create<memref::LoadOp>(loc, input, ValueRange{index});
+        sum = rewriter.create<arith::AddFOp>(loc, sum, a);
+      }
+      
+      rewriter.replaceOp(op, sum);
       return success();
     }
   };
@@ -231,7 +232,8 @@ namespace {
 
 void FlowToAffineLowingPass::runOnOperation() {
   ConversionTarget target(getContext());
-  target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect, memref::MemRefDialect>();
+  target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect,
+                         memref::MemRefDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
   // 确保TensorType已经全部转换为MemRef
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
