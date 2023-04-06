@@ -144,7 +144,13 @@ int dumpLLVMIR(mlir::ModuleOp module) {
 int main(int argc, char **argv) {
   cl::ParseCommandLineOptions(argc, argv, "flow compiler\n");
   mlir::MLIRContext context;
-  context.getOrLoadDialect<mlir::flow::FlowDialect>();
+
+  mlir::DialectRegistry registry;
+  mlir::registerAllDialects(registry);
+  registry.insert<mlir::flow::FlowDialect>();
+
+  context.appendDialectRegistry(registry);
+
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module))
     return error;

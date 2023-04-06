@@ -153,6 +153,7 @@ void FlowToLLVMLowingPass::runOnOperation() {
   populateMemRefToLLVMConversionPatterns(typeConverter, patterns);
   cf::populateControlFlowToLLVMConversionPatterns(typeConverter, patterns);
   populateFuncToLLVMConversionPatterns(typeConverter, patterns);
+  mlir::vec
 
   patterns.add<PrintOpLowering>(&getContext());
 

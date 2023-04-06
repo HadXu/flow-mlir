@@ -212,7 +212,7 @@ namespace {
         Value a = rewriter.create<memref::LoadOp>(loc, input, ValueRange{index});
         sum = rewriter.create<arith::AddFOp>(loc, sum, a);
       }
-      
+
       rewriter.replaceOp(op, sum);
       return success();
     }
@@ -233,7 +233,7 @@ namespace {
 void FlowToAffineLowingPass::runOnOperation() {
   ConversionTarget target(getContext());
   target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect,
-                         memref::MemRefDialect>();
+                         memref::MemRefDialect, vector::VectorDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
   // 确保TensorType已经全部转换为MemRef
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
