@@ -18,6 +18,7 @@
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
+#include "mlir/Dialect/LLVMIR/FunctionCallUtils.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
@@ -34,7 +35,19 @@ public:
     explicit PrintOpLowering(MLIRContext *context)
         : ConversionPattern(flow::PrintOp::getOperationName(), 1, context) {}
     LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands, ConversionPatternRewriter &rewriter) const override {
-      llvm::errs() << "printOp lowing to llvm\n";
+      /// https://github.com/llvm/llvm-project/blob/main/mlir/lib/Conversion/VectorToLLVM/ConvertVectorToLLVM.cpp#L1442
+      /// https://github.com/llvm/llvm-project/blob/release/16.x/mlir/include/mlir/Dialect/Vector/IR/VectorOps.td#L2437
+      auto parent = op->getParentOfType<ModuleOp>();
+      auto type = op->getOperandTypes().front();
+
+      if (type.isF64()) {
+        Operation *printer = LLVM::lookupOrCreatePrintF64Fn(parent);
+        rewriter.create<LLVM::CallOp>(op->getLoc(), TypeRange(),
+                                      SymbolRefAttr::get(printer),
+                                      ValueRange({operands, }));
+        rewriter.eraseOp(op);
+        return success();
+      }
 
       auto memRefType = (*op->operand_type_begin()).cast<MemRefType>();
       auto memRefShape = memRefType.getShape();
@@ -42,6 +55,7 @@ public:
 
       auto parentModule = op->getParentOfType<ModuleOp>();
       auto printfRef = getOrInsertPrintf(rewriter, parentModule);
+
 
       Value formatSpecifierCst = getOrCreateGlobalString(
               loc, rewriter, "frmt_spec", StringRef("%f \0", 4), parentModule);
@@ -153,8 +167,6 @@ void FlowToLLVMLowingPass::runOnOperation() {
   populateMemRefToLLVMConversionPatterns(typeConverter, patterns);
   cf::populateControlFlowToLLVMConversionPatterns(typeConverter, patterns);
   populateFuncToLLVMConversionPatterns(typeConverter, patterns);
-  mlir::vec
-
   patterns.add<PrintOpLowering>(&getContext());
 
   auto module = getOperation();

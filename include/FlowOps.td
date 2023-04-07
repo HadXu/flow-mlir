@@ -79,7 +79,11 @@ def PrintOp : Flow_Op<"print"> {
     let summary = "print operation";
     let description = [{ "flow.print" }];
     let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef, F64]>:$input);
-
+    let extraClassDeclaration = [{
+        Type getPrintType() {
+            return getInput().getType();
+        }
+    }];
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 

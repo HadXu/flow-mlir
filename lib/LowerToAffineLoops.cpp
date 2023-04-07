@@ -93,7 +93,6 @@ namespace {
     LogicalResult matchAndRewrite(flow::FuncOp op, OpAdaptor adaptor,
                                   ConversionPatternRewriter &rewriter) const final {
 
-      llvm::errs() << "FuncOpLowering\n";
       if (op.getName() != "main") {
         return failure();
       }
@@ -115,7 +114,6 @@ namespace {
     using OpRewritePattern<flow::ReturnOp>::OpRewritePattern;
     LogicalResult matchAndRewrite(flow::ReturnOp op,
                                   PatternRewriter &rewriter) const final {
-      llvm::errs() << "ReturnOpLowering\n";
       if (op.hasOperand())
         return failure();
       rewriter.replaceOpWithNewOp<func::ReturnOp>(op);
@@ -126,7 +124,6 @@ namespace {
   struct ConstantOpLowering : public OpRewritePattern<flow::ConstantOp> {
     using OpRewritePattern<flow::ConstantOp>::OpRewritePattern;
     LogicalResult matchAndRewrite(flow::ConstantOp op, PatternRewriter &rewriter) const final {
-      llvm::errs() << "ConstantOpLowering\n";
 
       DenseElementsAttr constantValue = op.getValue();
       Location loc = op.getLoc();
@@ -147,7 +144,6 @@ namespace {
 
       SmallVector<Value, 2> indices;
       auto valueIt = constantValue.value_begin<FloatAttr>();
-      llvm::errs() << valueShape.size() << "\n";
 
       std::function<void(uint64_t)> storeElements = [&](uint64_t dim) {
         if (dim == valueShape.size()) {
@@ -190,18 +186,13 @@ namespace {
 
     LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
                                   ConversionPatternRewriter &rewriter) const final {
-      llvm::errs() << "sum op lowering\n";
-      auto ctx = op->getContext();
       auto loc = op->getLoc();
       /// %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0]> : tensor<4xf64>
       /// %2 = flow.sum %0: tensor<4xf64> to f64
 
       auto input = operands[0];
-      input.dump();
       auto inputType = input.getType().cast<mlir::ShapedType>();// memref<fxf64>
-      inputType.dump();
       auto outputType = op->getResult(0).getType();// f64
-      outputType.dump();
 
       auto shape = inputType.getShape();// [4]
       assert(shape.size() == 1 && "expected 1D tensor");

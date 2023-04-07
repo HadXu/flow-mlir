@@ -13,9 +13,10 @@
 5. flow.mul ✅
 6. flow.sub ✅
 7. flow.div ✅
-8. flow.print ✅
+8. flow.print ✅ (支持各种print)
 9. flow.conv
 10. flow.dot
+11. flow.sum ✅ (1D)
 
 ## 1. flow dialect
 ```c++
@@ -173,7 +174,14 @@ module {
 }
 ```
 
-## 4. run with jit
+## 4. run with jit 
+use 
+```c++
+mlir::ExecutionEngineOptions engineOptions;
+engineOptions.transformer = optPipeline;
+engineOptions.sharedLibPaths = {"/home/lay/llvm/build/lib/libmlir_runner_utils.so", "/home/lay/llvm/build/lib/libmlir_c_runner_utils.so"};
+```
+
 ```c++
 1.000000 2.000000 3.000000
 4.000000 5.000000 6.000000

@@ -109,6 +109,8 @@ int runJit(mlir::ModuleOp module) {
 
   mlir::ExecutionEngineOptions engineOptions;
   engineOptions.transformer = optPipeline;
+  engineOptions.sharedLibPaths = {"/home/lay/llvm/build/lib/libmlir_runner_utils.so", "/home/lay/llvm/build/lib/libmlir_c_runner_utils.so"};
+
   auto maybeEngine = mlir::ExecutionEngine::create(module, engineOptions);
   assert(maybeEngine && "failed to construct an execution engine");
   auto &engine = maybeEngine.get();
