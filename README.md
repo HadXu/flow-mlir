@@ -199,6 +199,11 @@ make
 ```
 
 
+```
+/Users/lei/soft/llvm-project/build/bin/mlir-opt ../example/affine.mlir | /Users/lei/soft/llvm-project/build/bin/mlir-cpu-runner -e main -entry-point-result=void  -shared-libs=/Users/lei/soft/llvm-project/build/lib/libmlir_runner_utils.dylib -shared-libs=/Users/lei/soft/llvm-project/build/lib/libmlir_c_runner_utils.dylib
+```
+
+
 
 
 
