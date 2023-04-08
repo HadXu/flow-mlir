@@ -121,7 +121,6 @@ int runJit(mlir::ModuleOp module) {
     llvm::errs() << "JIT invocation failed\n";
     return -1;
   }
-
   return 0;
 }
 
@@ -146,13 +145,11 @@ int dumpLLVMIR(mlir::ModuleOp module) {
 
 int main(int argc, char **argv) {
   cl::ParseCommandLineOptions(argc, argv, "flow compiler\n");
-  mlir::MLIRContext context;
 
   mlir::DialectRegistry registry;
   mlir::registerAllDialects(registry);
   registry.insert<mlir::flow::FlowDialect>();
-
-  context.appendDialectRegistry(registry);
+  mlir::MLIRContext context(registry);
 
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module))

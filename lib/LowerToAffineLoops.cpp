@@ -192,7 +192,7 @@ namespace {
 
       auto input = operands[0];
       auto inputType = input.getType().cast<mlir::ShapedType>();// memref<fxf64>
-      auto outputType = op->getResult(0).getType();// f64
+      auto outputType = op->getResult(0).getType();             // f64
 
       auto shape = inputType.getShape();// [4]
       assert(shape.size() == 1 && "expected 1D tensor");
@@ -203,6 +203,15 @@ namespace {
         Value a = rewriter.create<memref::LoadOp>(loc, input, ValueRange{index});
         sum = rewriter.create<arith::AddFOp>(loc, sum, a);
       }
+
+      ImplicitLocOpBuilder locB(loc, rewriter);
+      auto lb = locB.create<arith::ConstantIndexOp>(0);
+      auto ub = locB.create<arith::ConstantIndexOp>(shape[0]);
+      auto step = locB.create<arith::ConstantIndexOp>(1);
+
+      auto result = locB.create<scf::ForOp>(lb, ub, step, ValueRange(),
+                                            [&](OpBuilder &b, Location loc, Value iv, ValueRange loopState) {
+                                            });
 
       rewriter.replaceOp(op, sum);
       return success();
@@ -215,7 +224,7 @@ namespace {
   struct FlowToAffineLowingPass : public PassWrapper<FlowToAffineLowingPass, OperationPass<ModuleOp>> {
     MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(FlowToAffineLowingPass)
     void getDependentDialects(DialectRegistry &registry) const override {
-      registry.insert<AffineDialect, func::FuncDialect, memref::MemRefDialect>();
+      registry.insert<AffineDialect, func::FuncDialect, memref::MemRefDialect, scf::SCFDialect>();
     }
     void runOnOperation() final;
   };
@@ -226,7 +235,6 @@ void FlowToAffineLowingPass::runOnOperation() {
   target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect,
                          memref::MemRefDialect, vector::VectorDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
-  // 确保TensorType已经全部转换为MemRef
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
                          [](Type type) { return type.isa<TensorType>(); });

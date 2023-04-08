@@ -15,6 +15,7 @@
 #include "mlir/Conversion/LLVMCommon/TypeConverter.h"
 #include "mlir/Conversion/MemRefToLLVM/MemRefToLLVM.h"
 #include "mlir/Conversion/SCFToControlFlow/SCFToControlFlow.h"
+#include "mlir/Conversion/VectorToLLVM/ConvertVectorToLLVM.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
@@ -28,7 +29,6 @@
 
 using namespace mlir;
 
-
 namespace {
   class PrintOpLowering : public ConversionPattern {
 public:
@@ -37,14 +37,21 @@ public:
     LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands, ConversionPatternRewriter &rewriter) const override {
       /// https://github.com/llvm/llvm-project/blob/main/mlir/lib/Conversion/VectorToLLVM/ConvertVectorToLLVM.cpp#L1442
       /// https://github.com/llvm/llvm-project/blob/release/16.x/mlir/include/mlir/Dialect/Vector/IR/VectorOps.td#L2437
+
+      auto printOp = cast<flow::PrintOp>(op);
+      Type printType = printOp.getPrintType();
+      printType.dump();
+
       auto parent = op->getParentOfType<ModuleOp>();
-      auto type = op->getOperandTypes().front();
+      auto type = printOp.getPrintType();
 
       if (type.isF64()) {
         Operation *printer = LLVM::lookupOrCreatePrintF64Fn(parent);
         rewriter.create<LLVM::CallOp>(op->getLoc(), TypeRange(),
                                       SymbolRefAttr::get(printer),
-                                      ValueRange({operands, }));
+                                      ValueRange({
+                                              operands,
+                                      }));
         rewriter.eraseOp(op);
         return success();
       }
@@ -86,7 +93,7 @@ public:
       }
 
       // Generate a call to printf for the current element of the loop.
-      auto printOp = cast<flow::PrintOp>(op);
+      //      auto printOp = cast<flow::PrintOp>(op);
       auto elementLoad =
               rewriter.create<memref::LoadOp>(loc, printOp.getInput(), loopIvs);
       rewriter.create<func::CallOp>(

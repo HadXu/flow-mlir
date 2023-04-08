@@ -149,7 +149,15 @@ def SumOp : Flow_Op<"sum"> {
     let hasCustomAssemblyFormat = 1;
     let builders = [
         OpBuilder<(ins "Value":$in)>
-     ];
+    ];
+
+    let extraClassDeclaration = [{
+        Type getPrintType() {
+            return getIn().getType();
+        }
+    }];
+
+
     let assemblyFormat = "$in attr-dict `:` type($in) `to` type($out)";
 }
 

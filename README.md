@@ -1,4 +1,4 @@
-# A MLIR Demo Dialect - Flow Dialect
+# A MLIR Demo Dialect - Flow Dialect (on LLVM(release/16.x))
 
 > 关于MLIR 官方的toy例子就非常好，但是非常分散，在实际项目中需要有一个统一的文件组织进行MLIR编译器的开发，本项目基于toy进行修改，统一文件排序规范以及链接库的整理。
 
