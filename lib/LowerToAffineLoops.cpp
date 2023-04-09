@@ -194,26 +194,25 @@ namespace {
       auto inputType = input.getType().cast<mlir::ShapedType>();// memref<fxf64>
       auto outputType = op->getResult(0).getType();             // f64
 
-      auto shape = inputType.getShape();// [4]
+      auto shape = inputType.getShape();
       assert(shape.size() == 1 && "expected 1D tensor");
-
-      Value sum = rewriter.create<arith::ConstantOp>(loc, FloatAttr::get(outputType, 0.0));
-      for (int i = 0; i < shape[0]; i++) {
-        Value index = rewriter.create<arith::ConstantIndexOp>(loc, i);
-        Value a = rewriter.create<memref::LoadOp>(loc, input, ValueRange{index});
-        sum = rewriter.create<arith::AddFOp>(loc, sum, a);
-      }
 
       ImplicitLocOpBuilder locB(loc, rewriter);
       auto lb = locB.create<arith::ConstantIndexOp>(0);
       auto ub = locB.create<arith::ConstantIndexOp>(shape[0]);
       auto step = locB.create<arith::ConstantIndexOp>(1);
 
-      auto result = locB.create<scf::ForOp>(lb, ub, step, ValueRange(),
+      Value initSum = locB.create<arith::ConstantOp>(loc, FloatAttr::get(outputType, 0.0));
+
+      auto result = locB.create<scf::ForOp>(lb, ub, step, ValueRange{initSum},
                                             [&](OpBuilder &b, Location loc, Value iv, ValueRange loopState) {
+                                              Value a = b.create<memref::LoadOp>(loc, input, ValueRange{iv});
+                                              Value sum = loopState[0];
+                                              Value sum2 = b.create<arith::AddFOp>(loc, sum, a);
+                                              b.create<scf::YieldOp>(loc, ValueRange{sum2});
                                             });
 
-      rewriter.replaceOp(op, sum);
+      rewriter.replaceOp(op, result.getResults());
       return success();
     }
   };
@@ -233,7 +232,7 @@ namespace {
 void FlowToAffineLowingPass::runOnOperation() {
   ConversionTarget target(getContext());
   target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect,
-                         memref::MemRefDialect, vector::VectorDialect>();
+                         memref::MemRefDialect, vector::VectorDialect, scf::SCFDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
