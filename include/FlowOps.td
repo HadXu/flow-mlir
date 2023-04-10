@@ -161,4 +161,18 @@ def SumOp : Flow_Op<"sum"> {
     let assemblyFormat = "$in attr-dict `:` type($in) `to` type($out)";
 }
 
+def DotOp : Flow_Op<"dot"> {
+    let summary = "dot operation";
+    let description = [{ "flow.dot" }];
+    let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
+    let results = (outs F64:$out);
+
+    let hasCustomAssemblyFormat = 1;
+
+    let builders = [
+        OpBuilder<(ins "Value":$lhs, "Value":$rhs)>
+    ];
+}
+
+
 #endif // FLOW_OPS
