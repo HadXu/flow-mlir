@@ -1,23 +1,17 @@
 #include "FlowDialect.h"
 #include "Passes.h"
 
-#include "mlir/Dialect/Affine/Passes.h"
 #include "mlir/ExecutionEngine/ExecutionEngine.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
-#include "mlir/IR/AsmState.h"
 #include "mlir/IR/BuiltinOps.h"
 #include "mlir/IR/MLIRContext.h"
-#include "mlir/IR/Verifier.h"
 #include "mlir/InitAllDialects.h"
+#include "mlir/InitAllPasses.h"
 #include "mlir/Parser/Parser.h"
-#include "mlir/Pass/Pass.h"
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "mlir/Target/LLVMIR/Export.h"
 #include "mlir/Transforms/Passes.h"
-#include <memory>
-
-#include "llvm/ADT/StringRef.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/ErrorOr.h"
@@ -25,6 +19,10 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
+#include "mlir/IR/Dialect.h"
+#include "mlir/Tools/mlir-opt/MlirOptMain.h"
+
+#include <memory>
 
 
 namespace cl = llvm::cl;
@@ -110,7 +108,7 @@ int runJit(mlir::ModuleOp module) {
   mlir::ExecutionEngineOptions engineOptions;
   engineOptions.transformer = optPipeline;
   engineOptions.sharedLibPaths = {"/home/lay/llvm/build/lib/libmlir_runner_utils.so", "/home/lay/llvm/build/lib/libmlir_c_runner_utils.so"};
-//  engineOptions.sharedLibPaths = {"/Users/lei/soft/llvm-project/build/lib/libmlir_runner_utils.dylib", "/Users/lei/soft/llvm-project/build/lib/libmlir_c_runner_utils.dylib"};
+  //  engineOptions.sharedLibPaths = {"/Users/lei/soft/llvm-project/build/lib/libmlir_runner_utils.dylib", "/Users/lei/soft/llvm-project/build/lib/libmlir_c_runner_utils.dylib"};
 
   auto maybeEngine = mlir::ExecutionEngine::create(module, engineOptions);
   assert(maybeEngine && "failed to construct an execution engine");
@@ -146,6 +144,7 @@ int dumpLLVMIR(mlir::ModuleOp module) {
 int main(int argc, char **argv) {
   cl::ParseCommandLineOptions(argc, argv, "flow compiler\n");
 
+  mlir::registerAllPasses();
   mlir::DialectRegistry registry;
   mlir::registerAllDialects(registry);
   registry.insert<mlir::flow::FlowDialect>();

@@ -8,6 +8,7 @@
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/Linalg/Transforms/Transforms.h"
+#include "mlir/Dialect/Math/IR/Math.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/IR/BuiltinDialect.h"
@@ -272,7 +273,7 @@ namespace {
 void FlowToAffineLowingPass::runOnOperation() {
   ConversionTarget target(getContext());
   target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect,
-                         memref::MemRefDialect, vector::VectorDialect, scf::SCFDialect>();
+                         memref::MemRefDialect, vector::VectorDialect, scf::SCFDialect, math::MathDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
