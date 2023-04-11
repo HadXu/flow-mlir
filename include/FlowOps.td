@@ -182,5 +182,12 @@ def DotOp : Flow_Op<"dot"> {
     }];
 }
 
+def AbsfOp : Flow_Op<"absf"> {
+    let summary = "absf operation";
+    let description = [{ "flow.absf" }];
+    let arguments = (ins F64:$in);
+    let results = (outs F64:$out);
 
+    let assemblyFormat = "$in attr-dict `:` type($in) `to` type($out)" ;
+}
 #endif // FLOW_OPS
