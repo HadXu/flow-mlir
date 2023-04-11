@@ -192,13 +192,5 @@ mlir::ParseResult DivOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationSta
   return parseBinaryOp(parser, result);
 }
 
-mlir::ParseResult DotOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationState &result) {
-  return parseBinaryOp(parser, result);
-}
-
-void DotOp::print(::mlir::OpAsmPrinter &p) {
-  printBinaryOp(p, *this);
-}
-
 #define GET_OP_CLASSES
 #include "FlowOps.cpp.inc"

@@ -172,6 +172,14 @@ def DotOp : Flow_Op<"dot"> {
     let builders = [
         OpBuilder<(ins "Value":$lhs, "Value":$rhs)>
     ];
+
+    let assemblyFormat = "$lhs `,` $rhs attr-dict `:` type($lhs) `,` type($rhs) `to` type($out)";
+
+    let extraClassDeclaration = [{
+        Type getOutType() {
+            return getOut().getType();
+        }
+    }];
 }
 
 

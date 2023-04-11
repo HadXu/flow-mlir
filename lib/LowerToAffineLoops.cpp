@@ -217,6 +217,46 @@ namespace {
     }
   };
 
+  struct DotOpLowering : public ConversionPattern {
+    DotOpLowering(MLIRContext *context)
+        : ConversionPattern(flow::DotOp::getOperationName(), 1, context) {}
+    LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                                  ConversionPatternRewriter &rewriter) const final {
+      assert(operands.size() == 2 && "expected 2 operands");
+      flow::DotOp dotOp = cast<flow::DotOp>(op);
+      auto loc = op->getLoc();
+      auto inputType = operands[0].getType().cast<mlir::ShapedType>();
+      auto outputType = dotOp.getOutType();
+
+
+      auto left = operands[0];
+      auto right = operands[1];
+
+      auto length = inputType.getShape()[0];
+
+      ImplicitLocOpBuilder locB(loc, rewriter);
+      auto lb = locB.create<arith::ConstantIndexOp>(0);
+      auto ub = locB.create<arith::ConstantIndexOp>(length);
+      auto step = locB.create<arith::ConstantIndexOp>(1);
+
+      Value initSum = locB.create<arith::ConstantOp>(loc, FloatAttr::get(outputType, 0.0));
+
+      auto result = locB.create<scf::ForOp>(lb, ub, step, ValueRange{initSum},
+                                            [&](OpBuilder &b, Location loc, Value iv, ValueRange loopState) {
+                                              Value aa = b.create<memref::LoadOp>(loc, left, ValueRange{iv});
+                                              Value bb = b.create<memref::LoadOp>(loc, right, ValueRange{iv});
+
+                                              Value cc = b.create<arith::MulFOp>(loc, aa, bb);
+
+                                              Value s = b.create<arith::AddFOp>(loc, loopState[0], cc);
+                                              b.create<scf::YieldOp>(loc, ValueRange{s});
+                                            });
+
+      rewriter.replaceOp(op, result.getResults());
+      return success();
+    }
+  };
+
 }// namespace
 
 namespace {
@@ -243,7 +283,7 @@ void FlowToAffineLowingPass::runOnOperation() {
   patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
                PrintOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
-               SumOpLowering>(&getContext());
+               SumOpLowering, DotOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }
