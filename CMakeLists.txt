@@ -11,6 +11,7 @@ elseif (UNIX AND APPLE)
     set(MLIR_DIR "/Users/lei/soft/llvm-project/build/lib/cmake/mlir")
     set(LLVM_DIR "/Users/lei/soft/llvm-project/build/lib/cmake/llvm")
 endif ()
+
 find_package(MLIR REQUIRED CONFIG)
 message(STATUS "Using MLIRConfig.cmake in: ${MLIR_DIR}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")

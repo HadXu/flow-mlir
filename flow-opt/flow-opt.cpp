@@ -89,6 +89,9 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   }
 
   if (isLoweringToLLVM) {
+    pm.addPass(mlir::createConvertMathToLLVMPass());
+    pm.addPass(mlir::createConvertMathToLibmPass());
+
     pm.addPass(mlir::flow::createLowerToLLVMPass());
   }
 
@@ -149,6 +152,7 @@ int main(int argc, char **argv) {
   mlir::registerAllDialects(registry);
   registry.insert<mlir::flow::FlowDialect>();
   mlir::MLIRContext context(registry);
+  context.loadAllAvailableDialects();
 
   mlir::OwningOpRef<mlir::ModuleOp> module;
   if (int error = loadAndProcessMLIR(context, module))
