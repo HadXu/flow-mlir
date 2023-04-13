@@ -82,6 +82,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   bool isLoweringToLLVM = emitAction >= Action::DumpMLIRLLVM;
 
   if (isLoweringToAffine) {
+    pm.addPass(mlir::createInlinerPass());
     pm.addPass(mlir::flow::createLowerToAffinePass());
     mlir::OpPassManager &optPM = pm.nest<mlir::flow::FuncOp>();
     optPM.addPass(mlir::createCanonicalizerPass());

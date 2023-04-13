@@ -1,3 +1,5 @@
+#map0 = affine_map<(d0, d1) -> (d0 + d1 - 1)>
+
 flow.func @main() {
     // %0 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
     // %1 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
@@ -11,5 +13,6 @@ flow.func @main() {
     %3 = flow.dot %0, %0: tensor<6xf64>, tensor<6xf64> to f64
     %4 = math.atan %3: f64
     flow.print %4: f64
+
     flow.return
 }

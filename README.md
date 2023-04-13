@@ -14,10 +14,12 @@
 6. flow.sub ✅
 7. flow.div ✅
 8. flow.print ✅ (支持各种print)
-9. flow.conv
 10. flow.dot ✅
 11. flow.sum ✅ (1D)
 12. support math Dialect ✅
+13. matmul(linalg)
+14. conv1d(linalg)
+15. conv2d(linalg)
 
 ## 1. flow dialect
 ```c++
