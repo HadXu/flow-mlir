@@ -53,7 +53,7 @@ engineOptions.sharedLibPaths = {"", ""};
 
 ```bash
 git clone https://github.com/llvm/llvm-project.git
-cd llvm-project && mkdir build && cd build
+cd llvm-project && git checkout release/16.x && mkdir build && cd build
 cmake -G Ninja ../llvm \
  -DLLVM_ENABLE_PROJECTS="mlir;clang" \
  -DLLVM_BUILD_EXAMPLES=ON \
