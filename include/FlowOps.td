@@ -188,6 +188,6 @@ def AbsfOp : Flow_Op<"absf"> {
     let arguments = (ins F64:$in);
     let results = (outs F64:$out);
 
-    let assemblyFormat = "$in attr-dict `:` type($in) `to` type($out)" ;
+    let assemblyFormat = "$in attr-dict `:` type($in)";
 }
 #endif // FLOW_OPS

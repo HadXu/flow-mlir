@@ -11,7 +11,7 @@ flow.func @main() {
     %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0, 9.0, 32.0]> : tensor<6xf64>
     %2 = flow.sum %0: tensor<6xf64> to f64
     %3 = flow.dot %0, %0: tensor<6xf64>, tensor<6xf64> to f64
-    %4 = math.atan %3: f64
+    %4 = flow.absf %3: f64
     flow.print %4: f64
 
     flow.return

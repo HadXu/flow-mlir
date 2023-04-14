@@ -4,6 +4,7 @@
 #include "mlir/ExecutionEngine/ExecutionEngine.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
 #include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/Dialect.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/InitAllDialects.h"
 #include "mlir/InitAllPasses.h"
@@ -11,6 +12,7 @@
 #include "mlir/Pass/PassManager.h"
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "mlir/Target/LLVMIR/Export.h"
+#include "mlir/Tools/mlir-opt/MlirOptMain.h"
 #include "mlir/Transforms/Passes.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/CommandLine.h"
@@ -19,8 +21,6 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
-#include "mlir/IR/Dialect.h"
-#include "mlir/Tools/mlir-opt/MlirOptMain.h"
 
 #include <memory>
 
@@ -84,6 +84,7 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (isLoweringToAffine) {
     pm.addPass(mlir::createInlinerPass());
     pm.addPass(mlir::flow::createLowerToAffinePass());
+
     mlir::OpPassManager &optPM = pm.nest<mlir::flow::FuncOp>();
     optPM.addPass(mlir::createCanonicalizerPass());
     optPM.addPass(mlir::createCSEPass());

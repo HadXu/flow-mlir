@@ -258,6 +258,17 @@ namespace {
     }
   };
 
+  struct AbsfOpLowering : public ConversionPattern {
+    explicit AbsfOpLowering(MLIRContext *context)
+        : ConversionPattern(flow::AbsfOp::getOperationName(), 1, context) {}
+    LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                                  ConversionPatternRewriter &rewriter) const final {
+      auto loc = op->getLoc();
+      Value r = rewriter.create<math::AbsFOp>(loc, operands[0]);
+      rewriter.replaceOp(op, r);
+      return success();
+    }
+  };
 }// namespace
 
 namespace {
@@ -275,6 +286,7 @@ void FlowToAffineLowingPass::runOnOperation() {
   target.addLegalDialect<AffineDialect, BuiltinDialect, arith::ArithDialect, func::FuncDialect,
                          memref::MemRefDialect, vector::VectorDialect, scf::SCFDialect, math::MathDialect>();
   target.addIllegalDialect<flow::FlowDialect>();
+
   target.addDynamicallyLegalOp<flow::PrintOp>([](flow::PrintOp op) {
     return llvm::none_of(op->getOperandTypes(),
                          [](Type type) { return type.isa<TensorType>(); });
@@ -284,7 +296,7 @@ void FlowToAffineLowingPass::runOnOperation() {
   patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
                PrintOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
-               SumOpLowering, DotOpLowering>(&getContext());
+               SumOpLowering, DotOpLowering, AbsfOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }
