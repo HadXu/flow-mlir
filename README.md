@@ -52,8 +52,22 @@ engineOptions.sharedLibPaths = {"", ""};
 ## Usage
 
 ```bash
+git clone https://github.com/llvm/llvm-project.git
+cd llvm-project && mkdir build && cd build
+cmake -G Ninja ../llvm \
+ -DLLVM_ENABLE_PROJECTS="mlir;clang" \
+ -DLLVM_BUILD_EXAMPLES=ON \
+ -DLLVM_TARGETS_TO_BUILD="host;RISCV;ARM;X86" \
+ -DCMAKE_BUILD_TYPE=Release \
+ -DLLVM_ENABLE_ASSERTIONS=ON \
+ -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+ -DLLVM_CCACHE_BUILD=ON \
+ -DMLIR_ENABLE_BINDINGS_PYTHON=ON
+ 
+# wait a coffe time.
+
 cd flow-mlir && mkdir build
-cmake ..
+cmake .. # you should look CMakelists.txt to change your mlir build path
 make
 ```
 
