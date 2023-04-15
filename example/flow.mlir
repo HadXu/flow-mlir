@@ -12,7 +12,8 @@ flow.func @main() {
     %2 = flow.sum %0: tensor<6xf64> to f64
     %3 = flow.dot %0, %0: tensor<6xf64>, tensor<6xf64> to f64
     %4 = flow.absf %3: f64
-    flow.print %4: f64
+    %5 = flow.sqrt %4: f64
+    flow.print %5: f64
 
     flow.return
 }
