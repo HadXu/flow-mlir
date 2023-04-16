@@ -22,6 +22,7 @@
 15. conv2d(linalg)
 16. sqrt ✅
 17. exp ✅
+18. pow 
 
 ## 1. flow dialect
 ```c++
