@@ -20,6 +20,8 @@
 13. matmul(linalg)
 14. conv1d(linalg)
 15. conv2d(linalg)
+16. sqrt ✅
+17. exp ✅
 
 ## 1. flow dialect
 ```c++

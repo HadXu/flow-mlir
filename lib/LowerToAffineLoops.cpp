@@ -282,6 +282,18 @@ namespace {
     }
   };
 
+  struct ExpOpLowering : public ConversionPattern {
+    explicit ExpOpLowering(MLIRContext *context)
+        : ConversionPattern(flow::ExpOp::getOperationName(), 1, context) {}
+    LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                                  ConversionPatternRewriter &rewriter) const final {
+      auto loc = op->getLoc();
+      Value r = rewriter.create<math::ExpOp>(loc, operands[0]);
+      rewriter.replaceOp(op, r);
+      return success();
+    }
+  };
+
 }// namespace
 
 namespace {
@@ -309,7 +321,8 @@ void FlowToAffineLowingPass::runOnOperation() {
   patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
                PrintOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
-               SumOpLowering, DotOpLowering, AbsfOpLowering, SqrtOpLowering>(&getContext());
+               SumOpLowering, DotOpLowering,
+               AbsfOpLowering, SqrtOpLowering, ExpOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }

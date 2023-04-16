@@ -200,4 +200,13 @@ def SqrtOp : Flow_Op<"sqrt"> {
     let assemblyFormat = "$in attr-dict `:` type($in)";
 }
 
+def ExpOp : Flow_Op<"exp"> {
+    let summary = "exp operation";
+    let description = [{ "flow.exp" }];
+    let arguments = (ins F64:$in);
+    let results = (outs F64:$out);
+
+    let assemblyFormat = "$in attr-dict `:` type($in)";
+}
+
 #endif // FLOW_OPS
