@@ -218,4 +218,15 @@ def PowOp : Flow_Op<"pow"> {
     let assemblyFormat = "$lhs `,` $rhs attr-dict `:` type($lhs) `,` type($rhs)";
 }
 
+def LogOp : Flow_Op<"log"> {
+    let summary = "log operation";
+    let description = [{ "flow.log" }];
+    let arguments = (ins F64:$in);
+    let results = (outs F64:$out);
+
+    let assemblyFormat = "$in attr-dict `:` type($in)";
+}
+
+
+
 #endif // FLOW_OPS

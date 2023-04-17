@@ -16,7 +16,9 @@ module {
         %5 = flow.sqrt %4: f64
         %6 = flow.exp %5: f64
         %7 = flow.pow %5, %5: f64, f64
-        flow.print %5: f64
+        %8 = flow.log %7: f64
+        %9 = flow.log %8: f64
+        flow.print %9: f64
 
         flow.return
     }
