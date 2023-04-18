@@ -227,6 +227,4 @@ def LogOp : Flow_Op<"log"> {
     let assemblyFormat = "$in attr-dict `:` type($in)";
 }
 
-
-
 #endif // FLOW_OPS

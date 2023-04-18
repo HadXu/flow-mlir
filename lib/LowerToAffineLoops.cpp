@@ -346,7 +346,8 @@ void FlowToAffineLowingPass::runOnOperation() {
                PrintOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
                SumOpLowering, DotOpLowering,
-               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering>(&getContext());
+               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering,
+               Conv1DOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }
