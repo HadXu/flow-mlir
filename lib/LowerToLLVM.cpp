@@ -3,8 +3,8 @@
 //
 
 
-#include "FlowDialect.h"
-#include "Passes.h"
+#include "Dialect/Flow/FlowDialect.h"
+#include "Dialect/Flow/Passes.h"
 
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
 #include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"

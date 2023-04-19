@@ -1,1 +1,1 @@
-add_mlir_dialect(FlowOps flow)
+add_subdirectory(Dialect)

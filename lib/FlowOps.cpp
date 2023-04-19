@@ -1,4 +1,4 @@
-#include "FlowDialect.h"
+#include "Dialect/Flow/FlowDialect.h"
 
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinTypes.h"
@@ -193,4 +193,4 @@ mlir::ParseResult DivOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationSta
 }
 
 #define GET_OP_CLASSES
-#include "FlowOps.cpp.inc"
+#include "Dialect/Flow/FlowOps.cpp.inc"

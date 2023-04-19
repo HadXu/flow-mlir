@@ -1,5 +1,5 @@
-#include "FlowDialect.h"
-#include "Passes.h"
+#include "Dialect/Flow/FlowDialect.h"
+#include "Dialect/Flow/Passes.h"
 
 #include "mlir/ExecutionEngine/ExecutionEngine.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
@@ -23,7 +23,6 @@
 #include "llvm/Support/raw_ostream.h"
 
 #include <memory>
-
 
 namespace cl = llvm::cl;
 

@@ -11,6 +11,5 @@
 
 #define GET_OP_CLASSES
 
-#include "FlowOps.h.inc"
-
+#include "Dialect/Flow/FlowOps.h.inc"
 #endif//FLOWOPS_H

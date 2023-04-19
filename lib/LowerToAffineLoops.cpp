@@ -1,8 +1,8 @@
 //
 // Created by lei on 2023/3/27.
 //
-#include "FlowDialect.h"
-#include "Passes.h"
+#include "Dialect/Flow/FlowDialect.h"
+#include "Dialect/Flow/Passes.h"
 
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
@@ -317,7 +317,6 @@ namespace {
       return success();
     }
   };
-
 }// namespace
 
 namespace {
@@ -346,8 +345,7 @@ void FlowToAffineLowingPass::runOnOperation() {
                PrintOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
                SumOpLowering, DotOpLowering,
-               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering,
-               Conv1DOpLowering>(&getContext());
+               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }
