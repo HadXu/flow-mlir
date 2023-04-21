@@ -12,9 +12,12 @@
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/IR/BuiltinDialect.h"
+#include "mlir/IR/BuiltinTypes.h"
+#include "mlir/IR/FunctionImplementation.h"
 #include "mlir/Pass/Pass.h"
 #include "mlir/Transforms/DialectConversion.h"
 #include "llvm/ADT/Sequence.h"
+
 
 using namespace mlir;
 // https://github.com/buddy-compiler/buddy-mlir/blob/main/midend/lib/Conversion/LowerDAP/LowerDAPPass.cpp
@@ -317,6 +320,23 @@ namespace {
       return success();
     }
   };
+
+  struct BoradcastPattern : public OpConversionPattern<flow::BroadcastOp> {
+    using OpConversionPattern<flow::BroadcastOp>::OpConversionPattern;
+    LogicalResult matchAndRewrite(flow::BroadcastOp op, OpAdaptor adaptor,
+                                  ConversionPatternRewriter &rewriter) const override {
+      auto loc = op->getLoc();
+      //      auto srcType = adaptor.getIn().getType().cast<RankedTensorType>();
+      auto shapedType = op.getType().cast<ShapedType>();
+
+      //      Value v = rewriter.create<arith::ConstantIndexOp>(loc, 3);
+
+      //      rewriter.replaceOp(op, v);
+      rewriter.eraseOp(op);
+      return success();
+    }
+  };
+
 }// namespace
 
 namespace {
@@ -345,7 +365,8 @@ void FlowToAffineLowingPass::runOnOperation() {
                PrintOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
                SumOpLowering, DotOpLowering,
-               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering>(&getContext());
+               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering,
+               BoradcastPattern>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }

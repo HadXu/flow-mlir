@@ -9,16 +9,19 @@ module {
         // %4 = flow.sub %3, %2: tensor<2x3xf64>
         // %5 = flow.div %4, %3: tensor<2x3xf64>
         // flow.print %5: tensor<2x3xf64>
-        %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0, 9.0, 32.0]> : tensor<6xf64>
-        %2 = flow.sum %0: tensor<6xf64> to f64
-        %3 = flow.dot %0, %0: tensor<6xf64>, tensor<6xf64> to f64
-        %4 = flow.absf %3: f64
-        %5 = flow.sqrt %4: f64
-        %6 = flow.exp %5: f64
-        %7 = flow.pow %5, %5: f64, f64
-        %8 = flow.log %7: f64
-        %9 = flow.log %8: f64
-        flow.print %9: f64
+        // %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0, 9.0, 32.0]> : tensor<6xf64>
+        // %2 = flow.sum %0: tensor<6xf64> to f64
+        // %3 = flow.dot %0, %0: tensor<6xf64>, tensor<6xf64> to f64
+        // %4 = flow.absf %3: f64
+        // %5 = flow.sqrt %4: f64
+        // %6 = flow.exp %5: f64
+        // %7 = flow.pow %5, %5: f64, f64
+        // %8 = flow.log %7: f64
+        // %9 = flow.log %8: f64
+        // flow.print %9: f64
+
+        %1 = arith.constant 256 : i32
+        %2 = flow.broadcast %1: (i32) -> tensor<256xi32>
 
         flow.return
     }

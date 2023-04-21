@@ -228,36 +228,16 @@ def LogOp : Flow_Op<"log"> {
 }
 
 
-def TT_Float : AnyTypeOf<[F8E4M3FN, F8E5M2, F16, BF16, F32, F64], "floating-point">;
-def TT_FloatTensor : TensorOf<[TT_Float]>;
-def TT_FloatLike : AnyTypeOf<[TT_Float, TT_FloatTensor]>;
+def BroadcastOp: Flow_Op<"broadcast", [Pure]> {
+    let summary = "broadcast operation";
+    let description = [{ "flow.broadcast" }];
+    let arguments = (ins F_Type:$in);
+    let results = (outs F_Type:$out);
 
-def TT_BoolTensor : TensorOf<[I1]>;
-def TT_BoolLike : AnyTypeOf<[I1, TT_BoolTensor]>;
+    let assemblyFormat = "$in attr-dict `:` functional-type(operands, $out)";
 
-def TT_Int : AnyTypeOf<[I1, I8, I16, I32, I64], "integer">;
-def TT_IntTensor : TensorOf<[TT_Int]>;
-def TT_IntLike : AnyTypeOf<[TT_Int, TT_IntTensor]>;
-
-
-def TT_I32Like : AnyTypeOf<[I32, I32Tensor]>;
-def TT_I64Like : AnyTypeOf<[I64, I64Tensor]>;
-
-
-
-
-def TT_FpIntTensor : AnyTypeOf<[TT_FloatTensor, TT_IntTensor]>;
-
-def TT_xxOp: Flow_Op<"xx", [Pure]> {
-    let summary = "xx";
-
-    let description = [{
-        $d = matrix_multiply($a, $b) + $c
-    }];
-
-    let arguments = (ins TT_FpIntTensor:$a, TT_FpIntTensor:$b, TT_FpIntTensor:$c, BoolAttr:$allowTF32);
-    let results = (outs TT_FpIntTensor:$d);
-    let assemblyFormat = "$a`,` $b`,` $c attr-dict `:` type($a) `*` type($b) `+` type($c) `->` type($d)";
+    // let hasCanonicalizeMethod = 1;
+    // let hasFolder = 1;
 }
 
 
