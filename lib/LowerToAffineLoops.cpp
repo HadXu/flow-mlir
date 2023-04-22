@@ -321,21 +321,25 @@ namespace {
     }
   };
 
-  struct BoradcastPattern : public OpConversionPattern<flow::BroadcastOp> {
-    using OpConversionPattern<flow::BroadcastOp>::OpConversionPattern;
-    LogicalResult matchAndRewrite(flow::BroadcastOp op, OpAdaptor adaptor,
-                                  ConversionPatternRewriter &rewriter) const override {
+  struct TransposeOpLowering : public ConversionPattern {
+    TransposeOpLowering(MLIRContext *ctx) : ConversionPattern(flow::TransposeOp::getOperationName(), 1, ctx) {}
+
+    LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
+                                  ConversionPatternRewriter &rewriter) const final {
+
       auto loc = op->getLoc();
-      //      auto srcType = adaptor.getIn().getType().cast<RankedTensorType>();
-      auto shapedType = op.getType().cast<ShapedType>();
 
-      //      Value v = rewriter.create<arith::ConstantIndexOp>(loc, 3);
+      lowerOpToLoops(op, operands, rewriter, [loc](OpBuilder &builder, ValueRange memRefOperands, ValueRange loopIvs) {
+        flow::TransposeOpAdaptor transposeAdaptor(memRefOperands);
+        Value input = transposeAdaptor.getInput();
 
-      //      rewriter.replaceOp(op, v);
-      rewriter.eraseOp(op);
+        SmallVector<Value, 2> reverseIvs(llvm::reverse(loopIvs));
+        return builder.create<AffineLoadOp>(loc, input, reverseIvs);
+      });
       return success();
     }
   };
+
 
 }// namespace
 
@@ -362,11 +366,10 @@ void FlowToAffineLowingPass::runOnOperation() {
 
   RewritePatternSet patterns(&getContext());
   patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
-               PrintOpLowering,
+               PrintOpLowering, TransposeOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
                SumOpLowering, DotOpLowering,
-               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering,
-               BoradcastPattern>(&getContext());
+               AbsfOpLowering, SqrtOpLowering, ExpOpLowering, PowOpLowering, LogOpLowering>(&getContext());
   if (failed(applyPartialConversion(getOperation(), target, std::move(patterns))))
     signalPassFailure();
 }

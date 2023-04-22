@@ -192,5 +192,43 @@ mlir::ParseResult DivOp::parse(::mlir::OpAsmParser &parser, ::mlir::OperationSta
   return parseBinaryOp(parser, result);
 }
 
+void TransposeOp::build(mlir::OpBuilder &builder, mlir::OperationState &state,
+                        mlir::Value value) {
+  state.addTypes(UnrankedTensorType::get(builder.getF64Type()));
+  state.addOperands(value);
+}
+
+mlir::LogicalResult TransposeOp::verify() {
+  auto inputType = getOperand().getType().dyn_cast<RankedTensorType>();
+  auto resultType = getType().dyn_cast<RankedTensorType>();
+  if (!inputType || !resultType)
+    return success();
+  auto inputShape = inputType.getShape();
+  if (!std::equal(inputShape.begin(), inputShape.end(), resultType.getShape().rbegin())) {
+    return emitError() << "expected result shape to be a transpose of the input";
+  }
+  return success();
+}
+
+
+struct SimplifyRedundantTranspose : public mlir::OpRewritePattern<TransposeOp> {
+  SimplifyRedundantTranspose(mlir::MLIRContext *context) : OpRewritePattern<TransposeOp>(context, /*benefit=*/1) {}
+  LogicalResult matchAndRewrite(TransposeOp op,
+                                mlir::PatternRewriter &rewriter) const override {
+    Value transposeInput = op.getOperand();
+    auto transposeInputOp = transposeInput.getDefiningOp<TransposeOp>();
+
+    if (!transposeInputOp)
+      return failure();
+
+    rewriter.replaceOp(op, {transposeInputOp.getOperand()});
+    return success();
+  }
+};
+
+void TransposeOp::getCanonicalizationPatterns(RewritePatternSet &results, MLIRContext *context) {
+  results.add<SimplifyRedundantTranspose>(context);
+}
+
 #define GET_OP_CLASSES
 #include "Dialect/Flow/FlowOps.cpp.inc"

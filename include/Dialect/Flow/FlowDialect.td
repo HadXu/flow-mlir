@@ -15,6 +15,7 @@ def Flow_Dialect : Dialect {
     ];
 }
 
+
 class Flow_Op<string mnemonic, list<Trait> traits = []> : Op<Flow_Dialect, mnemonic, traits>;
 
 def F_Float: AnyTypeOf<[F8E4M3FN, F8E5M2, F16, BF16, F32, F64], "floating-point">;
@@ -29,5 +30,7 @@ def F_I32Like: AnyTypeOf<[I32, I32Tensor]>;
 def F_I64Like: AnyTypeOf<[I64, I64Tensor]>;
 
 def F_Type: AnyTypeOf<[F_FloatLike, F_IntLike]>;
+def F_FpIntTensor : AnyTypeOf<[F_FloatTensor, F_IntTensor]>;
+def F_Tensor : AnyTypeOf<[F_FpIntTensor]>;
 
 #endif // FLOW_DIALECT

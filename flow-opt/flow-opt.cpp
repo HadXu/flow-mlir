@@ -107,7 +107,7 @@ int runJit(mlir::ModuleOp module) {
 
   mlir::registerLLVMDialectTranslation(*module->getContext());
 
-  auto optPipeline = mlir::makeOptimizingTransformer(3, 0, nullptr);
+  auto optPipeline = mlir::makeOptimizingTransformer(0, 0, nullptr);
 
   mlir::ExecutionEngineOptions engineOptions;
   engineOptions.transformer = optPipeline;

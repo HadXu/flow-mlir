@@ -227,18 +227,55 @@ def LogOp : Flow_Op<"log"> {
     let assemblyFormat = "$in attr-dict `:` type($in)";
 }
 
+//def SplatOp : Flow_Op<"splat", [Pure]> {
+//    let summary = "splat";
+//    let arguments = (ins F_Type:$src);
+//    let results = (outs F_Tensor:$result);
+//
+//    let assemblyFormat = "$src attr-dict `:` functional-type(operands, results)";
+//
+//    let hasFolder = 1;
+//
+//}
+//
+//def BroadcastOp: Flow_Op<"broadcast", [Pure]> {
+//    let summary = "broadcast operation";
+//    let description = [{ "flow.broadcast" }];
+//    let arguments = (ins F_Type:$in);
+//    let results = (outs F_Type:$out);
+//
+//    let assemblyFormat = "$in attr-dict `:` functional-type(operands, results)";
+//
+//    // let hasCanonicalizeMethod = 1;
+//    // let hasFolder = 1;
+//}
 
-def BroadcastOp: Flow_Op<"broadcast", [Pure]> {
-    let summary = "broadcast operation";
-    let description = [{ "flow.broadcast" }];
-    let arguments = (ins F_Type:$in);
-    let results = (outs F_Type:$out);
-
-    let assemblyFormat = "$in attr-dict `:` functional-type(operands, $out)";
-
-    // let hasCanonicalizeMethod = 1;
-    // let hasFolder = 1;
+def Cast : Flow_Op<"cast", [SameOperandsAndResultShape]> {
+    let summary = "shape cast operation";
+    let description = [{ cast }];
+    let arguments = (ins F64Tensor:$input);
+    let results = (outs F64Tensor:$output);
+    let assemblyFormat = "$input attr-dict `:` type($input) `to` type($output)";
 }
+
+def TransposeOp : Flow_Op<"transpose", [Pure]> {
+    let summary = "transpose operation";
+    let arguments = (ins F64Tensor:$input);
+    let results = (outs F64Tensor);
+
+    let assemblyFormat = [{
+      `(` $input `:` type($input) `)` attr-dict `to` type(results)
+    }];
+
+    let hasCanonicalizer = 1;
+
+    let builders = [
+      OpBuilder<(ins "Value":$input)>
+    ];
+
+    let hasVerifier = 1;
+}
+
 
 
 #endif // FLOW_OPS

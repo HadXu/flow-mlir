@@ -2,7 +2,7 @@
 
 > 关于MLIR 官方的toy例子就非常好，但是非常分散，在实际项目中需要有一个统一的文件组织进行MLIR编译器的开发，本项目基于toy进行修改，统一文件排序规范以及链接库的整理。
 
-## Flow Dialect Ops
+## Flow Dialect Ops (todo GPU Support openai/triton)
 
 1. flow.constant ✅
 2. flow.func ✅
@@ -22,9 +22,11 @@
 15. conv2d(linalg)
 16. sqrt ✅
 17. exp ✅
-18. pow 
+18. pow ✅
+19. transpose ✅
 
 ## 1. flow dialect
+
 ```c++
 flow.func @main() {
     %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0, 9.0, 32.0]> : tensor<6xf64>
@@ -36,13 +38,14 @@ flow.func @main() {
 }
 ```
 
-
 ## 2. lowing to affine
 
 ## 3. lowing to llvm
 
-## 4. run with jit 
-use 
+## 4. run with jit
+
+use
+
 ```c++
 mlir::ExecutionEngineOptions engineOptions;
 engineOptions.transformer = optPipeline;
@@ -50,6 +53,7 @@ engineOptions.sharedLibPaths = {"", ""};
 ```
 
 ## lowing to llvm
+
 将custom dialect lowering to vector dialect. (need to read vector lowering source file).
 
 ## Usage
