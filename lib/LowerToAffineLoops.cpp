@@ -365,7 +365,7 @@ void FlowToAffineLowingPass::runOnOperation() {
   });
 
   RewritePatternSet patterns(&getContext());
-  patterns.add<FuncOpLowering, ReturnOpLowering, ConstantOpLowering,
+  patterns.add<ReturnOpLowering, ConstantOpLowering, FuncOpLowering,
                PrintOpLowering, TransposeOpLowering,
                AddOpLowering, SubOpLowering, MulOpLowering, DivOpLowering,
                SumOpLowering, DotOpLowering,
