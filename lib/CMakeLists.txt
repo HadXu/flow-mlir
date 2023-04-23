@@ -9,6 +9,7 @@ add_mlir_dialect_library(MLIRFlow
 
         DEPENDS
         MLIRFlowOpsIncGen # FlowOps
+        CombineIncGen
 
         LINK_LIBS PUBLIC
 

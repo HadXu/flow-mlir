@@ -230,5 +230,14 @@ void TransposeOp::getCanonicalizationPatterns(RewritePatternSet &results, MLIRCo
   results.add<SimplifyRedundantTranspose>(context);
 }
 
+namespace {
+#include "Dialect/Flow/Combine.inc"
+}
+
+void ReshapeOp::getCanonicalizationPatterns(::mlir::RewritePatternSet &results, ::mlir::MLIRContext *context) {
+  results.add<ReshapeReshapeOptPattern, RedundantReshapeOptPattern, FoldConstantReshapeOptPattern>(context);
+}
+
+
 #define GET_OP_CLASSES
 #include "Dialect/Flow/FlowOps.cpp.inc"

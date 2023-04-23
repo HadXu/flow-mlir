@@ -322,7 +322,7 @@ namespace {
   };
 
   struct TransposeOpLowering : public ConversionPattern {
-    TransposeOpLowering(MLIRContext *ctx) : ConversionPattern(flow::TransposeOp::getOperationName(), 1, ctx) {}
+    explicit TransposeOpLowering(MLIRContext *ctx) : ConversionPattern(flow::TransposeOp::getOperationName(), 1, ctx) {}
 
     LogicalResult matchAndRewrite(Operation *op, ArrayRef<Value> operands,
                                   ConversionPatternRewriter &rewriter) const final {

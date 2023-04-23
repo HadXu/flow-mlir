@@ -276,6 +276,20 @@ def TransposeOp : Flow_Op<"transpose", [Pure]> {
     let hasVerifier = 1;
 }
 
+def ReshapeOp : Flow_Op<"reshape", [Pure]> {
+    let summary = "reshape operation";
+    let description = [{ "flow.reshape" }];
+
+    let arguments = (ins F64Tensor:$input);
+    let assemblyFormat = [{
+        `(` $input `:` type($input) `)` attr-dict `to` type(results)
+    }];
+
+    let results = (outs StaticShapeTensorOf<[F64]>);
+
+    let hasCanonicalizer = 1;
+}
+
 
 
 #endif // FLOW_OPS
