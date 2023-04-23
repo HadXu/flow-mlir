@@ -87,7 +87,7 @@ def PrintOp : Flow_Op<"print"> {
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 
-def AddOp : Flow_Op<"add"> {
+def AddOp : Flow_Op<"add", [Pure]> {
     let summary = "add operation";
     let description = [{ "flow.add" }];
     let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
@@ -289,7 +289,5 @@ def ReshapeOp : Flow_Op<"reshape", [Pure]> {
 
     let hasCanonicalizer = 1;
 }
-
-
 
 #endif // FLOW_OPS

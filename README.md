@@ -8,7 +8,7 @@
 2. flow.func ✅
 3. flow.return ✅
 4. flow.transpose ✅
-5. flow.reshape
+5. flow.reshape ✅
 4. flow.add ✅
 5. flow.mul ✅
 6. flow.sub ✅
@@ -23,7 +23,6 @@
 16. sqrt ✅
 17. exp ✅
 18. pow ✅
-
 
 ## 1. flow dialect
 

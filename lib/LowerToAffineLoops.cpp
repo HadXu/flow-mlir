@@ -377,3 +377,12 @@ void FlowToAffineLowingPass::runOnOperation() {
 std::unique_ptr<Pass> mlir::flow::createLowerToAffinePass() {
   return std::make_unique<FlowToAffineLowingPass>();
 }
+
+
+namespace {
+  struct ShapeInferencePass : public mlir::PassWrapper<ShapeInferencePass, OperationPass<flow::FuncOp>> {
+    MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(ShapeInferencePass)
+    void runOnOperation() override {
+    }
+  };
+}// namespace

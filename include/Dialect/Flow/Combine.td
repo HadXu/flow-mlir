@@ -4,6 +4,7 @@
 include "mlir/IR/PatternBase.td"
 include "Dialect/Flow/FlowOps.td"
 
+// Reshape(Reshape(x)) = Reshape(x)
 def ReshapeReshapeOptPattern : Pat<(ReshapeOp(ReshapeOp $arg)),
                                    (ReshapeOp $arg)>;
 
@@ -13,7 +14,7 @@ def FoldConstantReshapeOptPattern : Pat<
   (ReshapeOp:$res (ConstantOp $arg)),
   (ConstantOp (ReshapeConstant $arg, $res))>;
 
-
+// Reshape(x) = x, where input and output shapes are identical
 def TypesAreIdentical : Constraint<CPred<"$0.getType() == $1.getType()">>;
 def RedundantReshapeOptPattern : Pat<
   (ReshapeOp:$res $arg), (replaceWithValue $arg),

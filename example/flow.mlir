@@ -1,13 +1,7 @@
-flow.func @t(%arg0: tensor<*xf64>) -> tensor<*xf64> {
-    %0 = flow.transpose(%arg0 : tensor<*xf64>) to tensor<*xf64>
-    %1 = flow.transpose(%0 : tensor<*xf64>) to tensor<*xf64>
-    flow.return %1 : tensor<*xf64>
-}
-
 flow.func @main() {
     %0 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
-    %1 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
-    %2 = flow.transpose(%0 : tensor<2x3xf64>) to tensor<3x2xf64>
+    // %1 = flow.constant dense<[[1.000000e+00, 2.000000e+00, 3.000000e+00], [4.000000e+00, 5.000000e+00, 6.000000e+00]]> : tensor<2x3xf64>
+    // %2 = flow.transpose(%0 : tensor<2x3xf64>) to tensor<3x2xf64>
 
     // %2 = flow.add %1, %0: tensor<2x3xf64>
     // %3 = flow.mul %1, %0: tensor<2x3xf64>
@@ -28,8 +22,11 @@ flow.func @main() {
     // %11 = arith.constant 13.3 : f64
     // %22 = flow.splat %11 : (f64) -> tensor<128xf64>
 
-    flow.print %2: tensor<3x2xf64>
+    // flow.print %2: tensor<3x2xf64>
 
+    %1 = flow.reshape(%0 : tensor<2x3xf64>) to tensor<3x2xf64>
+    %2 = flow.reshape(%1 : tensor<3x2xf64>) to tensor<3x2xf64>
+    flow.print %2: tensor<3x2xf64>
     flow.return
 }
 
