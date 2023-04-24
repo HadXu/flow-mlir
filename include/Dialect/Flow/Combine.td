@@ -4,6 +4,12 @@
 include "mlir/IR/PatternBase.td"
 include "Dialect/Flow/FlowOps.td"
 
+//class Pattern<
+//    dag sourcePattern, list<dag> resultPatterns,
+//    list<dag> additionalConstraints = [],
+//    dag benefitsAdded = (addBenefit 0)>;
+
+
 // Reshape(Reshape(x)) = Reshape(x)
 def ReshapeReshapeOptPattern : Pat<(ReshapeOp(ReshapeOp $arg)),
                                    (ReshapeOp $arg)>;

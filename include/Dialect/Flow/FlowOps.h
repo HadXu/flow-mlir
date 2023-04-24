@@ -10,6 +10,5 @@
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
 #define GET_OP_CLASSES
-
 #include "Dialect/Flow/FlowOps.h.inc"
 #endif//FLOWOPS_H

@@ -1,6 +1,7 @@
 add_mlir_dialect_library(MLIRFlow
         FlowDialect.cpp
         FlowOps.cpp
+        FlowTypes.cpp
         LowerToLLVM.cpp
         LowerToAffineLoops.cpp
 

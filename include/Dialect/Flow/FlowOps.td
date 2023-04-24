@@ -1,12 +1,14 @@
 #ifndef FLOW_OPS
 #define FLOW_OPS
 
-include "FlowDialect.td"
+include "Dialect/Flow/FlowDialect.td"
 include "mlir/IR/FunctionInterfaces.td"
 include "mlir/IR/SymbolInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
 include "mlir/Interfaces/CastInterfaces.td"
 include "mlir/Interfaces/SideEffectInterfaces.td"
+
+class Flow_Op<string mnemonic, list<Trait> traits = []> : Op<Flow_Dialect, mnemonic, traits>;
 
 def ConstantOp : Flow_Op<"constant", [Pure]> {
     let summary = "constant";
@@ -227,29 +229,6 @@ def LogOp : Flow_Op<"log"> {
     let assemblyFormat = "$in attr-dict `:` type($in)";
 }
 
-//def SplatOp : Flow_Op<"splat", [Pure]> {
-//    let summary = "splat";
-//    let arguments = (ins F_Type:$src);
-//    let results = (outs F_Tensor:$result);
-//
-//    let assemblyFormat = "$src attr-dict `:` functional-type(operands, results)";
-//
-//    let hasFolder = 1;
-//
-//}
-//
-//def BroadcastOp: Flow_Op<"broadcast", [Pure]> {
-//    let summary = "broadcast operation";
-//    let description = [{ "flow.broadcast" }];
-//    let arguments = (ins F_Type:$in);
-//    let results = (outs F_Type:$out);
-//
-//    let assemblyFormat = "$in attr-dict `:` functional-type(operands, results)";
-//
-//    // let hasCanonicalizeMethod = 1;
-//    // let hasFolder = 1;
-//}
-
 def Cast : Flow_Op<"cast", [SameOperandsAndResultShape]> {
     let summary = "shape cast operation";
     let description = [{ cast }];
@@ -289,5 +268,9 @@ def ReshapeOp : Flow_Op<"reshape", [Pure]> {
 
     let hasCanonicalizer = 1;
 }
+
+
+
+
 
 #endif // FLOW_OPS
