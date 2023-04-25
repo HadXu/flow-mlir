@@ -58,6 +58,13 @@ engineOptions.sharedLibPaths = {"", ""};
 ## Usage
 
 ```bash
+## 2023.04.25 update
+
+use pre-built mlir && llvm library
+https://github.com/ptillet/triton-llvm-releases
+
+or build yourself.
+
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project && git checkout release/16.x && mkdir build && cd build
 cmake -G Ninja ../llvm \

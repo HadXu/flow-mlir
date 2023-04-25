@@ -269,7 +269,40 @@ def ReshapeOp : Flow_Op<"reshape", [Pure]> {
     let hasCanonicalizer = 1;
 }
 
+//////// triton
 
+def IntToPtrOp : Flow_Op<"int_to_ptr", [SameOperandsAndResultShape, Pure]> {
+    let summary = "Cast int64 to pointer";
+
+    let arguments = (ins F_I64Like:$from);
+
+    let results = (outs F_PtrLike:$result);
+
+    let assemblyFormat = "$from attr-dict `:` type($from) `->` type($result)";
+}
+
+def PtrToIntOp : Flow_Op<"ptr_to_int", [SameOperandsAndResultShape, Pure]> {
+    let summary = "Cast pointer to int64";
+
+    let arguments = (ins F_PtrLike:$from);
+
+    let results = (outs F_I64Like:$result);
+
+    let assemblyFormat = "$from attr-dict `:` type($from) `->` type($result)";
+}
+
+def SplatOp : Flow_Op<"splat", [Pure,
+                                 SameOperandsAndResultElementType,]> {
+    let summary = "splat";
+
+    let arguments = (ins F_Type:$src);
+
+    let results = (outs F_Tensor:$result);
+
+    let assemblyFormat = "$src attr-dict `:` functional-type(operands, results)";
+
+    // let hasFolder = 1;
+}
 
 
 

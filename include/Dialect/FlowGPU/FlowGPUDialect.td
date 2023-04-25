@@ -13,10 +13,6 @@ def FlowGPU_Dialect : Dialect {
   let description = [{
     Flow GPU Dialect.
   }];
-
-  let useDefaultAttributePrinterParser = 1;
-
-  let useFoldAPI = kEmitFoldAdaptorFolder;
 }
 
 #endif //FLOWGPU_DIALECT

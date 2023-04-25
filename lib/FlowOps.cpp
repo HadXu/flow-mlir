@@ -133,6 +133,16 @@ llvm::ArrayRef<mlir::Type> FuncOp::getCallableResults() {
   return getFunctionType().getResults();
 }
 
+ArrayAttr FuncOp::getCallableArgAttrs() {
+  return getArgAttrs().value_or(nullptr);
+}
+
+/// Returns the result attributes for all callable region results or
+/// null if there are none.
+ArrayAttr FuncOp::getCallableResAttrs() {
+  return getResAttrs().value_or(nullptr);
+}
+
 mlir::LogicalResult ReturnOp::verify() {
   auto function = cast<FuncOp>((*this)->getParentOp());
 

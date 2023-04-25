@@ -10,6 +10,7 @@
 #include "mlir/InitAllPasses.h"
 #include "mlir/Parser/Parser.h"
 #include "mlir/Pass/PassManager.h"
+#include "mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h"
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "mlir/Target/LLVMIR/Export.h"
 #include "mlir/Tools/mlir-opt/MlirOptMain.h"
@@ -74,8 +75,10 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   if (int error = loadMLIR(context, module))
     return error;
 
-  mlir::PassManager pm(&context);
-  applyPassManagerCLOptions(pm);
+  mlir::PassManager pm(module.get()->getName());
+
+  if (mlir::failed(applyPassManagerCLOptions(pm)))
+    return 4;
 
   bool isLoweringToAffine = emitAction >= Action::DumpMLIRAffine;
   bool isLoweringToLLVM = emitAction >= Action::DumpMLIRLLVM;
@@ -108,6 +111,7 @@ int runJit(mlir::ModuleOp module) {
   llvm::InitializeNativeTarget();
   llvm::InitializeNativeTargetAsmPrinter();
 
+  mlir::registerBuiltinDialectTranslation(*module->getContext());
   mlir::registerLLVMDialectTranslation(*module->getContext());
 
   auto optPipeline = mlir::makeOptimizingTransformer(0, 0, nullptr);
@@ -130,6 +134,7 @@ int runJit(mlir::ModuleOp module) {
 }
 
 int dumpLLVMIR(mlir::ModuleOp module) {
+  mlir::registerBuiltinDialectTranslation(*module->getContext());
   mlir::registerLLVMDialectTranslation(*module->getContext());
   llvm::LLVMContext llvmContext;
   auto llvmModule = mlir::translateModuleToLLVMIR(module, llvmContext);
@@ -140,18 +145,24 @@ int dumpLLVMIR(mlir::ModuleOp module) {
 
   llvm::InitializeNativeTarget();
   llvm::InitializeNativeTargetAsmPrinter();
-  mlir::ExecutionEngine::setupTargetTriple(llvmModule.get());
+
+  auto tmBuilderOrError = llvm::orc::JITTargetMachineBuilder::detectHost();
+  auto tmOrError = tmBuilderOrError->createTargetMachine();
+  mlir::ExecutionEngine::setupTargetTripleAndDataLayout(llvmModule.get(), tmOrError.get().get());
 
   llvm::errs() << *llvmModule << "\n";
-
-
   return 0;
 }
 
 int main(int argc, char **argv) {
+  mlir::registerAsmPrinterCLOptions();
+  mlir::registerMLIRContextCLOptions();
+  mlir::registerPassManagerCLOptions();
+  mlir::registerAllPasses();
+
+
   cl::ParseCommandLineOptions(argc, argv, "flow compiler\n");
 
-  mlir::registerAllPasses();
   mlir::DialectRegistry registry;
   mlir::registerAllDialects(registry);
   registry.insert<mlir::flow::FlowDialect>();

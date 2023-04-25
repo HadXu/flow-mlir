@@ -12,4 +12,9 @@
 #define GET_TYPEDEF_CLASSES
 #include "Dialect/Flow/FlowOpsTypes.h.inc"
 
+namespace mlir::flow {
+  Type getPointeeType(Type type);
+  Type getPointerType(Type type);
+}// namespace mlir::flow
+
 #endif//FLOW_FLOWTYPES_H
