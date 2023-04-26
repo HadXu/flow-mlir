@@ -77,10 +77,10 @@ def ReturnOp : Flow_Op<"return", [Pure, HasParent<"FuncOp">,
   let hasVerifier = 1;
 }
 
-def PrintOp : Flow_Op<"print"> {
+def PrintOp : Flow_Op<"print", [MemoryEffects<[MemWrite]>]>  {
     let summary = "print operation";
     let description = [{ "flow.print" }];
-    let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef, F64]>:$input);
+    let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef, F64, I32Tensor, I64Tensor, I32]>:$input);
     let extraClassDeclaration = [{
         Type getPrintType() {
             return getInput().getType();
@@ -145,8 +145,8 @@ def DivOp : Flow_Op<"div"> {
 def SumOp : Flow_Op<"sum"> {
     let summary = "sum operation";
     let description = [{ "flow.sum" }];
-    let arguments = (ins F64Tensor:$in);
-    let results = (outs F64:$out);
+    let arguments = (ins F_Tensor:$in);
+    let results = (outs F_Type:$out);
 
     let hasCustomAssemblyFormat = 1;
     let builders = [
@@ -158,7 +158,6 @@ def SumOp : Flow_Op<"sum"> {
             return getIn().getType();
         }
     }];
-
 
     let assemblyFormat = "$in attr-dict `:` type($in) `to` type($out)";
 }
@@ -304,6 +303,14 @@ def SplatOp : Flow_Op<"splat", [Pure,
     // let hasFolder = 1;
 }
 
+def MakeRangeOp: Flow_Op<"make_range", [Pure]> {
+    let summary = "make range";
+    let description = [{ Returns an 1D int32 tensor. Values span from $start to $end (exclusive), with step = 1}];
+
+    let arguments = (ins I32Attr:$start, I32Attr:$end);
+    let results = (outs F_IntTensor:$result);
+    let assemblyFormat = "attr-dict `:` type($result)";
+}
 
 
 #endif // FLOW_OPS
