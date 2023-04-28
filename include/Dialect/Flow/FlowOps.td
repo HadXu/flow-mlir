@@ -2,6 +2,8 @@
 #define FLOW_OPS
 
 include "Dialect/Flow/FlowDialect.td"
+include "Dialect/Flow/ShapeInferenceInterface.td"
+include "mlir/IR/OpBase.td"
 include "mlir/IR/FunctionInterfaces.td"
 include "mlir/IR/SymbolInterfaces.td"
 include "mlir/Interfaces/CallInterfaces.td"
@@ -89,7 +91,7 @@ def PrintOp : Flow_Op<"print", [MemoryEffects<[MemWrite]>]>  {
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 
-def AddOp : Flow_Op<"add", [Pure]> {
+def AddOp : Flow_Op<"add", [Pure, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
     let summary = "add operation";
     let description = [{ "flow.add" }];
     let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);

@@ -5,6 +5,7 @@ add_mlir_dialect_library(MLIRFlow
         FlowTypes.cpp
         LowerToLLVM.cpp
         LowerToAffineLoops.cpp
+        ShapeInference.cpp
 
         ADDITIONAL_HEADER_DIRS
         ${PROJECT_SOURCE_DIR}/include
@@ -12,6 +13,7 @@ add_mlir_dialect_library(MLIRFlow
         DEPENDS
         MLIRFlowOpsIncGen # FlowOps
         CombineIncGen
+        ShapeInferenceInterfaceIncGen
 
         LINK_LIBS PUBLIC
 

@@ -9,6 +9,10 @@
 #include "mlir/Interfaces/CastInterfaces.h"
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
+#include "Dialect/Flow/ShapeInferenceInterface.h"
+
+
 #define GET_OP_CLASSES
 #include "Dialect/Flow/FlowOps.h.inc"
+
 #endif//FLOWOPS_H
