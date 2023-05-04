@@ -77,7 +77,7 @@ def ReturnOp : Flow_Op<"return", [Pure, HasParent<"FuncOp">,
   let hasVerifier = 1;
 }
 
-def PrintOp : Flow_Op<"print"> {
+def PrintOp : Flow_Op<"print", [MemoryEffects<[MemWrite]>]>,  {
     let summary = "print operation";
     let description = [{ "flow.print" }];
     let arguments = (ins AnyTypeOf<[F64Tensor, F64MemRef, F64]>:$input);
@@ -268,9 +268,6 @@ def ReshapeOp : Flow_Op<"reshape", [Pure]> {
 
     let hasCanonicalizer = 1;
 }
-
-
-
 
 
 #endif // FLOW_OPS
