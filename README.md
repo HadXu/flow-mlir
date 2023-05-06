@@ -23,6 +23,12 @@
 16. sqrt ✅
 17. exp ✅
 18. pow ✅
+19. log ✅
+20. sin ✅
+21. cos ✅
+22. tan ✅
+23. atan ✅
+24. tanh ✅
 
 ## 1. flow dialect
 
