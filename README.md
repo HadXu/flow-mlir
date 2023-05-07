@@ -2,6 +2,18 @@
 
 > 关于MLIR 官方的toy例子就非常好，但是非常分散，在实际项目中需要有一个统一的文件组织进行MLIR编译器的开发，本项目基于toy进行修改，统一文件排序规范以及链接库的整理。
 
+## 展望
+
+1. 集成stablehlo/mhlo （比较适合于cpu和gpu）
+2. 参考bladedisc
+
+## 大纲
+
+1. graph 转 stablehlo
+2. stablehlo 转 mlir llvm
+3. mlir llvm  to llvm ir
+4. jit run
+
 ## Flow Dialect Ops (todo GPU Support openai/triton)
 
 1. flow.constant ✅
@@ -82,6 +94,11 @@ cd flow-mlir && mkdir build
 cmake .. # you should look CMakelists.txt to change your mlir build path
 make
 ```
+
+## Reference
+
+1. https://github.com/openxla/stablehlo
+
 
 
 
