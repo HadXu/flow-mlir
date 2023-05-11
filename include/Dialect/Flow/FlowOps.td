@@ -91,7 +91,7 @@ def PrintOp : Flow_Op<"print", [MemoryEffects<[MemWrite]>]>  {
     let assemblyFormat = "$input attr-dict `:` type($input)";
 }
 
-def AddOp : Flow_Op<"add", [Pure, DeclareOpInterfaceMethods<ShapeInferenceOpInterface>]> {
+def AddOp : Flow_Op<"add", [Pure]> {
     let summary = "add operation";
     let description = [{ "flow.add" }];
     let arguments = (ins F64Tensor:$lhs, F64Tensor:$rhs);
@@ -271,6 +271,16 @@ def ReshapeOp : Flow_Op<"reshape", [Pure]> {
 }
 
 //////// triton
+
+def GetProgramIdOp: Flow_Op<"get_program_id", [Pure]> {
+    let summary = "get program id";
+    let description = [{ "flow.get_program_id" }];
+
+    let arguments = (ins I32Attr:$axis);
+    let results = (outs I32:$result);
+    let assemblyFormat = "attr-dict `:` type($result)";
+}
+
 
 def IntToPtrOp : Flow_Op<"int_to_ptr", [SameOperandsAndResultShape, Pure]> {
     let summary = "Cast int64 to pointer";

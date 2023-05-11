@@ -28,8 +28,10 @@ flow.func @main() {
     // %2 = flow.reshape(%1 : tensor<3x2xf64>) to tensor<3x2xf64>
     // %2 = flow.make_range {end = 16 : i32, start = 0 : i32} : tensor<16xi32>
     %0 = flow.constant dense<[1.0, 2.0, 3.0, 4.0, 9.0, 32.0]> : tensor<6xf64>
+    %1 = flow.get_program_id {axis = 0: i32} : i32
     %3 = flow.sum %0: tensor<6xf64> to f64
     flow.print %3: f64
+    flow.print %1: i32
     flow.return
 }
 
