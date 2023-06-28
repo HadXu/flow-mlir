@@ -9,6 +9,19 @@ class FlowTypeDef<string name, string _mnemonic> : TypeDef<Flow_Dialect, name> {
     let mnemonic = _mnemonic;
 }
 
+def My_IntegerType : FlowTypeDef<"Integer", "int"> {
+    let summary = "Integer type with arbitrary precision up to a fixed limit";
+      let description = [{
+        Integer types have a designated bit width.
+      }];
+
+    /// Here we defined a single parameter for the type, which is the bitwidth.
+    let parameters = (ins "unsigned":$width);
+
+    let assemblyFormat = "`<` $width `>`";
+    let genVerifyDecl = 1;
+}
+
 def F_Float: AnyTypeOf<[F8E4M3FN, F8E5M2, F16, BF16, F32, F64], "floating-point">;
 def F_FloatTensor: TensorOf<[F_Float]>;
 def F_FloatLike: AnyTypeOf<[F_Float, F_FloatTensor]>;
