@@ -324,5 +324,19 @@ def MakeRangeOp: Flow_Op<"make_range", [Pure]> {
     let assemblyFormat = "attr-dict `:` type($result)";
 }
 
+def ViewOp : Flow_Op<"view", [NoMemoryEffect,
+                               SameOperandsAndResultElementType]> {
+    let summary = "view";
+
+    let arguments = (ins F_Tensor:$src);
+
+    let results = (outs F_Tensor:$result);
+
+    let assemblyFormat = "$src attr-dict `:` functional-type(operands, results)";
+
+    // let hasCanonicalizeMethod = 1;
+    // let hasFolder = 1;
+}
+
 
 #endif // FLOW_OPS
